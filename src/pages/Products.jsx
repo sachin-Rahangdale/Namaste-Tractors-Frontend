@@ -1,143 +1,233 @@
-
 import React, { useState, useEffect, useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../component/layout/Navbar";
 import ProductCard from "../component/cards/ProductCard";
 import EnquiryForm from "../component/common/EnquiryForm";
 import { AuthContext } from "../context/AuthContext";
-import { getProducts, getProductsByCity } from "../services/productService";
+import { getFilteredProducts } from "../services/productService";
 
 const Products = () => {
-  const { user } = useContext(AuthContext);
-  const navigate = useNavigate();
+  const { user } = useContext(AuthContext); //
+  const navigate = useNavigate(); //
 
-  const [products, setProducts] = useState([]);
+  // Category Lists
+  const [machinery, setMachinery] = useState([]);
+  const [crops, setCrops] = useState([]);
+  const [vegetables, setVegetables] = useState([]);
+  
+  // UI States
   const [loading, setLoading] = useState(true);
-  const [searchCity, setSearchCity] = useState("");
-  const [activeCity, setActiveCity] = useState("");
+  
+  // Filter States (City, Min, Max)
+  const [tempFilters, setTempFilters] = useState({ city: "", minPrice: "", maxPrice: "" }); //
+  const [activeFilters, setActiveFilters] = useState({ city: "", minPrice: "", maxPrice: "" }); //
+  
+  // Page trackers
+  const [pages, setPages] = useState({ MACHINERY: 0, CROP: 0, VEGETABLE: 0 }); //
 
   useEffect(() => {
-    fetchInitialProducts();
-  }, []);
+    const initializeMarketplace = async () => {
+      setLoading(true);
+      setPages({ MACHINERY: 0, CROP: 0, VEGETABLE: 0 }); //
+      
+      await Promise.all([
+        loadCategoryData("MACHINERY", 0, false),
+        loadCategoryData("CROP", 0, false),
+        loadCategoryData("VEGETABLE", 0, false)
+      ]);
+      setLoading(false);
+    };
+    initializeMarketplace();
+  }, [activeFilters]);
 
-  const fetchInitialProducts = async () => {
-    setLoading(true);
+  const loadCategoryData = async (category, pageNum, isAppending = false) => {
     try {
-      const data = await getProducts(0, 12);
-      setProducts(data.content);
-      setActiveCity("");
-    } catch (err) { console.error(err); }
-    finally { setLoading(false); }
-  };
+      const params = {
+        category: category, //
+        page: pageNum,
+        size: 4,
+        ...(activeFilters.city && { city: activeFilters.city }), //
+        ...(activeFilters.minPrice && { minPrice: activeFilters.minPrice }), //
+        ...(activeFilters.maxPrice && { maxPrice: activeFilters.maxPrice }), //
+      };
 
-  const handleCitySearch = async (e) => {
-    e.preventDefault();
-    if (!searchCity.trim()) return fetchInitialProducts();
-    
-    setLoading(true);
-    try {
-      const data = await getProductsByCity(searchCity);
-      setProducts(data.content);
-      setActiveCity(searchCity);
-    } catch (err) { console.error(err); }
-    finally { setLoading(false); }
-  };
+      const data = await getFilteredProducts(params); //
+      
+      const setter = category === "MACHINERY" ? setMachinery : 
+                     category === "CROP" ? setCrops : setVegetables;
 
-  // SMART ACTION: Check login before navigating
-  const handleProtectedAction = (path) => {
-    if (!user) {
-      // Redirect to login with a message (could be handled via state)
-      navigate("/login");
-    } else {
-      navigate(path);
+      setter(prev => isAppending ? [...prev, ...data.content] : data.content); //
+    } catch (err) {
+      console.error(`Failed to fetch ${category}:`, err);
     }
+  };
+
+  const handleApplyFilters = (e) => {
+    e.preventDefault();
+    setActiveFilters({ ...tempFilters }); //
+  };
+
+  const clearFilters = () => {
+    const reset = { city: "", minPrice: "", maxPrice: "" };
+    setTempFilters(reset);
+    setActiveFilters(reset); //
+  };
+
+  const handleLoadMore = (category) => {
+    const nextPage = pages[category] + 1;
+    setPages(prev => ({ ...prev, [category]: nextPage })); //
+    loadCategoryData(category, nextPage, true); //
   };
 
   return (
     <div className="bg-slate-50 min-h-screen">
       <Navbar />
 
-      {/* PRODUCT HERO / TOOLBAR */}
-      <div className="bg-white border-b border-gray-100 py-8 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 flex flex-col md:flex-row justify-between items-center gap-6">
-          <div>
-            <h1 className="text-3xl font-black text-gray-900">Machinery & Produce</h1>
-            <p className="text-gray-500">Buy and sell agricultural equipment and crops locally.</p>
+      {/* ENHANCED FILTER & NAVIGATION TOOLBAR */}
+      <div className="bg-white border-b border-gray-100 py-6 sticky top-16 z-40 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4">
+          <div className="flex flex-col lg:flex-row justify-between items-end gap-6">
+            
+            {/* Filter Form */}
+            <form onSubmit={handleApplyFilters} className="grid grid-cols-1 md:grid-cols-3 gap-4 flex-grow w-full">
+              <div>
+                <label className="block text-[10px] font-black text-gray-400 mb-1 uppercase tracking-widest">📍 Location</label>
+                <input 
+                  type="text" placeholder="Search City..."
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                  value={tempFilters.city}
+                  onChange={(e) => setTempFilters({...tempFilters, city: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-black text-gray-400 mb-1 uppercase tracking-widest">💰 Min Price</label>
+                <input 
+                  type="number" placeholder="₹ Min"
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                  value={tempFilters.minPrice}
+                  onChange={(e) => setTempFilters({...tempFilters, minPrice: e.target.value})}
+                />
+              </div>
+              <div>
+                <label className="block text-[10px] font-black text-gray-400 mb-1 uppercase tracking-widest">💰 Max Price</label>
+                <input 
+                  type="number" placeholder="₹ Max"
+                  className="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-xl outline-none focus:ring-2 focus:ring-green-500 text-sm"
+                  value={tempFilters.maxPrice}
+                  onChange={(e) => setTempFilters({...tempFilters, maxPrice: e.target.value})}
+                />
+              </div>
+            </form>
+
+            {/* Action Buttons: Apply, My Listings, and Sell */}
+            <div className="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+              <button 
+                onClick={handleApplyFilters}
+                className="bg-green-600 text-white px-8 py-2.5 rounded-xl font-bold hover:bg-green-700 transition shadow-lg shadow-green-100 flex-grow md:flex-grow-0"
+              >
+                Apply Filters
+              </button>
+              
+              {/* RESTORED: My Listings Button */}
+              <button 
+                onClick={() => user ? navigate("/products/my") : navigate("/login")}
+                className="px-6 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition"
+              >
+                My Listings
+              </button>
+
+              {/* RESTORED: Sell Product Button */}
+              <button 
+                onClick={() => user ? navigate("/products/new") : navigate("/login")}
+                className="bg-black text-white px-6 py-2.5 rounded-xl font-bold hover:bg-gray-800 transition"
+              >
+                + Sell Now
+              </button>
+            </div>
           </div>
 
-          <div className="flex flex-wrap gap-3">
-            <button 
-              onClick={() => handleProtectedAction("/products/my")}
-              className="px-5 py-2.5 bg-gray-100 text-gray-700 rounded-xl font-bold hover:bg-gray-200 transition"
-            >
-              My Listings
-            </button>
-            <button 
-              onClick={() => handleProtectedAction("/products/new")}
-              className="px-6 py-2.5 bg-green-600 text-white rounded-xl font-bold hover:bg-green-700 transition shadow-lg shadow-green-100"
-            >
-              + Sell Product
-            </button>
-          </div>
+          {/* ACTIVE FILTER CHIPS */}
+          {(activeFilters.city || activeFilters.minPrice || activeFilters.maxPrice) && (
+            <div className="mt-4 flex items-center gap-3">
+              <span className="text-[10px] font-black text-gray-400 uppercase">Active:</span>
+              <div className="flex gap-2">
+                {activeFilters.city && (
+                  <span className="bg-red-50 text-red-600 px-3 py-1 rounded-full text-xs font-bold border border-red-100">
+                    📍 {activeFilters.city}
+                  </span>
+                )}
+                {(activeFilters.minPrice || activeFilters.maxPrice) && (
+                  <span className="bg-blue-50 text-blue-600 px-3 py-1 rounded-full text-xs font-bold border border-blue-100">
+                    ₹ {activeFilters.minPrice || 0} - {activeFilters.maxPrice || '∞'}
+                  </span>
+                )}
+                <button onClick={clearFilters} className="text-xs font-black text-red-600 underline ml-2">CLEAR ALL ✕</button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
 
-      <main className="max-w-7xl mx-auto px-4 py-12">
-        {/* CITY FILTER BAR */}
-        <div className="mb-10 max-w-xl">
-          <form onSubmit={handleCitySearch} className="flex gap-2">
-            <div className="relative flex-grow">
-              <span className="absolute left-4 top-3 text-gray-400">📍</span>
-              <input 
-                type="text" 
-                placeholder="Search by city (e.g. Nagpur, Gondia)..."
-                className="w-full pl-10 pr-4 py-3 bg-white border border-gray-200 rounded-2xl focus:ring-2 focus:ring-green-500 outline-none transition"
-                value={searchCity}
-                onChange={(e) => setSearchCity(e.target.value)}
-              />
-            </div>
-            <button type="submit" className="bg-black text-white px-8 py-3 rounded-2xl font-bold hover:bg-gray-800 transition">
-              Search
-            </button>
-          </form>
-          {activeCity && (
-            <p className="mt-3 text-sm text-gray-500">
-              Showing results for <span className="font-bold text-green-600">"{activeCity}"</span>
-              <button onClick={fetchInitialProducts} className="ml-2 underline">Clear</button>
-            </p>
-          )}
-        </div>
-
-        {/* PRODUCT GRID */}
-        {loading ? (
-          <div className="flex justify-center py-20"><div className="animate-spin rounded-full h-10 w-10 border-b-2 border-green-600"></div></div>
-        ) : (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            {products.map(product => (
-              <ProductCard key={product.id} data={product} />
-            ))}
-          </div>
-        )}
-
-        {products.length === 0 && !loading && (
-          <div className="text-center py-20 bg-white rounded-3xl border border-dashed border-gray-300">
-            <p className="text-gray-400 text-lg">No products found in this area. Be the first to list one!</p>
-          </div>
-        )}
+      <main className="max-w-7xl mx-auto px-4 py-16 space-y-24">
+        <CategorySection title="Machinery" emoji="⚙️" data={machinery} onLoadMore={() => handleLoadMore("MACHINERY")} loading={loading} />
+        <CategorySection title="Crops" emoji="🌾" data={crops} onLoadMore={() => handleLoadMore("CROP")} loading={loading} />
+        <CategorySection title="Vegetables" emoji="🥦" data={vegetables} onLoadMore={() => handleLoadMore("VEGETABLE")} loading={loading} />
       </main>
 
-      {/* ENQUIRY SECTION */}
-      <section className="bg-gray-100 py-20">
-        <div className="max-w-4xl mx-auto px-4">
-          <div className="text-center mb-10">
-            <h2 className="text-3xl font-bold text-gray-900">Need Expert Advice?</h2>
-            <p className="text-gray-600 mt-2">Get suggestions on machinery, crops, or local market prices.</p>
+      {/* FOOTER ENQUIRY SECTION (Fixed styling as promised) */}
+      <section className="bg-slate-900 py-24 relative">
+        <div className="max-w-4xl mx-auto px-4 relative z-10">
+          <div className="text-center mb-12">
+            <h2 className="text-4xl font-black text-white italic">Need Expert Suggestions?</h2>
+            <p className="text-slate-400 mt-2 italic font-medium">Ask our experts about crop prices, machinery health, or market trends.</p>
           </div>
-          <EnquiryForm defaultType="Need Suggestion" />
+          <div className="bg-white rounded-[3rem] p-4 shadow-2xl">
+            <div className="bg-slate-50 rounded-[2rem] p-6 border border-gray-100">
+              <EnquiryForm defaultType="Need Suggestion" />
+            </div>
+          </div>
         </div>
       </section>
     </div>
   );
 };
+
+// Reusable Category Component
+const CategorySection = ({ title, emoji, data, onLoadMore, loading }) => (
+  <section>
+    <div className="flex items-center gap-3 mb-10">
+      <span className="text-4xl">{emoji}</span>
+      <h2 className="text-3xl font-black text-gray-900 tracking-tight">{title}</h2>
+      <div className="flex-grow h-[2px] bg-gray-100 ml-4"></div>
+    </div>
+
+    {loading && data.length === 0 ? (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        {[1, 2, 3, 4].map(i => <div key={i} className="h-64 bg-gray-200 animate-pulse rounded-3xl"></div>)}
+      </div>
+    ) : (
+      <>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+          {data.map(product => <ProductCard key={product.id} data={product} />)}
+        </div>
+        
+        {data.length === 0 ? (
+          <div className="text-center py-16 bg-white border border-dashed rounded-3xl text-gray-400 font-medium">
+            No {title.toLowerCase()} available matching your filters.
+          </div>
+        ) : (
+          <div className="mt-12 text-center">
+            <button 
+              onClick={onLoadMore}
+              className="px-12 py-4 bg-white border-2 border-gray-200 text-gray-600 font-black rounded-2xl hover:border-green-600 hover:text-green-600 hover:bg-green-50 transition-all uppercase text-sm"
+            >
+              Load More {title}
+            </button>
+          </div>
+        )}
+      </>
+    )}
+  </section>
+);
 
 export default Products;

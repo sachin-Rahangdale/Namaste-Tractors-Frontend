@@ -28,3 +28,8 @@ export const getFilteredTractors = async (filters) => {
   const response = await api.get("/tractors/filter", { params: filters });
   return response.data;
 };
+
+export const getTractorsByBrand = async (brandId, page = 0, size = 10) => {
+  const response = await api.get(`/tractors/brand/${brandId}`, { params: { page, size } });
+  return response.data;
+};

@@ -7,9 +7,7 @@ import { getTractors, getFilteredTractors } from "../services/tractorservice";
 const Tractors = () => {
   const [tractors, setTractors] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [showFilters, setShowFilters] = useState(false);
   
-  // Filter State
   const [filters, setFilters] = useState({
     minHp: "",
     maxHp: "",
@@ -19,7 +17,6 @@ const Tractors = () => {
     size: 12
   });
 
-  // Initial Fetch
   useEffect(() => {
     loadTractors();
   }, []);
@@ -27,7 +24,7 @@ const Tractors = () => {
   const loadTractors = async () => {
     setLoading(true);
     try {
-      const data = await getTractors(0, 12);
+      const data = await getTractors(0, filters.size);
       setTractors(data.content);
     } catch (err) {
       console.error("Failed to load tractors", err);
@@ -37,16 +34,14 @@ const Tractors = () => {
   };
 
   const handleApplyFilters = async (e) => {
-    e.preventDefault();
+    if(e) e.preventDefault();
     setLoading(true);
     try {
-      // Cleaning empty strings to avoid API issues
       const activeFilters = Object.fromEntries(
         Object.entries(filters).filter(([_, v]) => v !== "")
       );
       const data = await getFilteredTractors(activeFilters);
       setTractors(data.content);
-      setShowFilters(false); // Close mobile filter menu after apply
     } catch (err) {
       console.error("Filter failed", err);
     } finally {
@@ -60,112 +55,137 @@ const Tractors = () => {
   };
 
   return (
-    <div className="bg-slate-50 min-h-screen">
+    <div className="bg-slate-50 min-h-screen pb-20">
       <Navbar />
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
-        <div className="flex flex-col md:flex-row gap-8">
-          
-          {/* SIDEBAR FILTER SECTION */}
-          <aside className="w-full md:w-1/4">
-            <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 sticky top-24">
-              <div className="flex items-center justify-between mb-6">
-                <h2 className="text-xl font-bold text-gray-800">Filters</h2>
-                <button 
-                  onClick={resetFilters}
-                  className="text-sm text-green-600 hover:underline font-medium"
-                >
-                  Reset
-                </button>
-              </div>
-
-              <form onSubmit={handleApplyFilters} className="space-y-6">
-                {/* HP Range */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">Horsepower (HP)</label>
-                  <div className="flex gap-2">
-                    <input 
-                      type="number" placeholder="Min" 
-                      className="w-1/2 p-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-green-500"
-                      value={filters.minHp}
-                      onChange={(e) => setFilters({...filters, minHp: e.target.value})}
-                    />
-                    <input 
-                      type="number" placeholder="Max" 
-                      className="w-1/2 p-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-green-500"
-                      value={filters.maxHp}
-                      onChange={(e) => setFilters({...filters, maxHp: e.target.value})}
-                    />
-                  </div>
-                </div>
-
-                {/* Price Range */}
-                <div>
-                  <label className="block text-sm font-semibold text-gray-700 mb-3">Budget (₹)</label>
-                  <div className="flex gap-2">
-                    <input 
-                      type="number" placeholder="Min" 
-                      className="w-1/2 p-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-green-500"
-                      value={filters.minPrice}
-                      onChange={(e) => setFilters({...filters, minPrice: e.target.value})}
-                    />
-                    <input 
-                      type="number" placeholder="Max" 
-                      className="w-1/2 p-2 border rounded-lg text-sm outline-none focus:ring-2 focus:ring-green-500"
-                      value={filters.maxPrice}
-                      onChange={(e) => setFilters({...filters, maxPrice: e.target.value})}
-                    />
-                  </div>
-                </div>
-
-                <button 
-                  type="submit"
-                  className="w-full bg-green-600 text-white font-bold py-3 rounded-xl hover:bg-green-700 transition shadow-lg shadow-green-100"
-                >
-                  Apply Filters
-                </button>
-              </form>
+      {/* HERO HEADER - Utilizes top space */}
+      <div className="bg-white border-b border-gray-100">
+        <div className="max-w-[1440px] mx-auto px-6 py-12 flex flex-col md:flex-row justify-between items-center">
+          <div>
+            <h1 className="text-4xl font-black text-gray-900 tracking-tight">Tractor Marketplace</h1>
+            <p className="text-gray-500 mt-2 font-medium">Explore {tractors.length} heavy-duty models for your field</p>
+          </div>
+          <div className="mt-6 md:mt-0 flex gap-4">
+            <div className="bg-green-50 p-4 rounded-2xl border border-green-100">
+                <p className="text-xs font-bold text-green-600 uppercase tracking-widest">Price Range</p>
+                <p className="text-lg font-bold text-gray-800">₹3L - ₹50L+</p>
             </div>
-          </aside>
-
-          {/* MAIN CONTENT SECTION */}
-          <main className="w-full md:w-3/4">
-            <div className="mb-8 flex justify-between items-center">
-              <h1 className="text-3xl font-extrabold text-gray-900">All Tractors</h1>
-              <p className="text-gray-500 font-medium">{tractors.length} Models Found</p>
+            <div className="bg-blue-50 p-4 rounded-2xl border border-blue-100">
+                <p className="text-xs font-bold text-blue-600 uppercase tracking-widest">HP Range</p>
+                <p className="text-lg font-bold text-gray-800">15 HP - 120 HP</p>
             </div>
+          </div>
+        </div>
+      </div>
 
-            {loading ? (
-              <div className="flex justify-center py-20">
-                <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+      <div className="max-w-[1440px] mx-auto px-6 py-8">
+        
+        {/* HORIZONTAL FILTER BAR - Replaces Sidebar to use full width */}
+        <div className="bg-white p-4 rounded-[2rem] shadow-sm border border-gray-100 mb-10 flex flex-wrap items-center gap-6 sticky top-20 z-30">
+          <div className="flex-grow grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div className="space-y-1">
+              <label className="text-[10px] font-black text-gray-400 uppercase ml-2">HP (Min-Max)</label>
+              <div className="flex gap-1">
+                <input 
+                  type="number" placeholder="Min" 
+                  className="w-full bg-gray-50 p-2 rounded-xl text-sm outline-none focus:ring-2 focus:ring-green-500 transition-all"
+                  value={filters.minHp}
+                  onChange={(e) => setFilters({...filters, minHp: e.target.value})}
+                />
+                <input 
+                  type="number" placeholder="Max" 
+                  className="w-full bg-gray-50 p-2 rounded-xl text-sm outline-none focus:ring-2 focus:ring-green-500 transition-all"
+                  value={filters.maxHp}
+                  onChange={(e) => setFilters({...filters, maxHp: e.target.value})}
+                />
               </div>
-            ) : (
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+            </div>
+            <div className="space-y-1">
+              <label className="text-[10px] font-black text-gray-400 uppercase ml-2">Budget (Min-Max)</label>
+              <div className="flex gap-1">
+                <input 
+                  type="number" placeholder="₹ Min" 
+                  className="w-full bg-gray-50 p-2 rounded-xl text-sm outline-none focus:ring-2 focus:ring-green-500 transition-all"
+                  value={filters.minPrice}
+                  onChange={(e) => setFilters({...filters, minPrice: e.target.value})}
+                />
+                <input 
+                  type="number" placeholder="₹ Max" 
+                  className="w-full bg-gray-50 p-2 rounded-xl text-sm outline-none focus:ring-2 focus:ring-green-500 transition-all"
+                  value={filters.maxPrice}
+                  onChange={(e) => setFilters({...filters, maxPrice: e.target.value})}
+                />
+              </div>
+            </div>
+          </div>
+          <div className="flex gap-2">
+            <button 
+              onClick={handleApplyFilters}
+              className="bg-green-600 text-white font-bold px-8 py-3 rounded-2xl hover:bg-green-700 transition shadow-lg shadow-green-100"
+            >
+              Update Search
+            </button>
+            <button 
+              onClick={resetFilters}
+              className="p-3 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-2xl transition"
+              title="Reset All"
+            >
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        {/* MAIN PRODUCT GRID - Expanded to 4 Columns on XL */}
+        <main>
+          {loading ? (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+              {[1, 2, 3, 4, 5, 6, 7, 8].map(i => (
+                <div key={i} className="bg-white h-[350px] rounded-3xl animate-pulse border border-gray-100"></div>
+              ))}
+            </div>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
                 {tractors.map((tractor) => (
                   <Card key={tractor.id} data={tractor} />
                 ))}
               </div>
-            )}
 
-            {tractors.length === 0 && !loading && (
-              <div className="text-center py-20 bg-white rounded-2xl border border-dashed">
-                <p className="text-gray-400">No tractors match your filters. Try adjusting them!</p>
-              </div>
-            )}
-          </main>
-        </div>
+              {tractors.length === 0 && (
+                <div className="text-center py-40 bg-white rounded-[3rem] border border-dashed border-gray-200">
+                  <div className="max-w-xs mx-auto">
+                    <p className="text-gray-300 text-6xl mb-4">🚜</p>
+                    <h3 className="text-xl font-bold text-gray-800">No Tractors Found</h3>
+                    <p className="text-gray-400 mt-2">Adjust your filters or reset the search to discover more models.</p>
+                  </div>
+                </div>
+              )}
+            </>
+          )}
+        </main>
 
-        {/* PRE-FILLED ENQUIRY SECTION */}
-        <div className="mt-24 border-t pt-16">
-          <div className="text-center mb-10">
-            <span className="bg-green-100 text-green-700 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest">Inquiry</span>
-            <h2 className="text-3xl font-bold mt-4">Want to Purchase a New Tractor?</h2>
+        {/* ENQUIRY SECTION - Re-styled for better space utilization */}
+        <section className="mt-32 relative overflow-hidden">
+          <div className="absolute top-0 right-0 w-96 h-96 bg-green-200 rounded-full blur-[100px] opacity-20 -z-10"></div>
+          <div className="bg-slate-900 rounded-[3rem] p-12 md:p-20 flex flex-col lg:flex-row items-center gap-12">
+            <div className="lg:w-1/2 text-center lg:text-left">
+                <span className="text-green-400 font-bold uppercase tracking-widest text-sm">Mechanical Muscle</span>
+                <h2 className="text-4xl md:text-5xl font-black text-white mt-4 leading-tight tracking-tighter">
+                    Finding the Perfect <span className="italic text-green-400">Powerhouse</span> For Your Farm?
+                </h2>
+                <p className="text-slate-400 mt-6 text-lg max-w-lg">
+                    Our experts provide on-road prices, loan assistance, and regional subsidy details.
+                </p>
+            </div>
+            <div className="lg:w-1/2 w-full bg-white p-2 rounded-[2.5rem]">
+                <div className="bg-slate-50 p-8 rounded-[2rem]">
+                    <EnquiryForm defaultType="tractor" defaultMessage="I am interested in a new tractor purchase." />
+                </div>
+            </div>
           </div>
-          <EnquiryForm 
-            defaultType="tractor" 
-            defaultMessage="I want to purchase a new tractor." 
-          />
-        </div>
+        </section>
       </div>
     </div>
   );

@@ -55,3 +55,8 @@ export const uploadProductImages = async (id, formData) => {
   });
   return res.data;
 };
+
+export const getFilteredProducts = async (params) => {
+  const response = await api.get("/products/filter", { params });
+  return response.data;
+};

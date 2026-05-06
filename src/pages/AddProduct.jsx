@@ -6,20 +6,37 @@ import { createProduct, uploadProductImages } from "../services/productService";
 const AddProduct = () => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [productId, setProductId] = useState(null);
-  const [files, setFiles] = useState([]);
+  const [selectedFiles, setSelectedFiles] = useState([]);
+  const [previews, setPreviews] = useState([]);
 
   const [formData, setFormData] = useState({
     productName: "",
     price: "",
     unit: "",
+    phone: "", // Added
     city: "",
-    category: "MACHINERY",
-    description: ""
+    pincode: "", // Added
+    description: "",
+    category: "MACHINERY"
   });
 
+  // Handle Text Inputs
+  const handleChange = (e) => {
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+  };
+
+  // Handle Image Selection with Previews
   const handleFileChange = (e) => {
-    setFiles([...e.target.files]);
+    const files = Array.from(e.target.files);
+    setSelectedFiles((prev) => [...prev, ...files]);
+
+    const newPreviews = files.map((file) => URL.createObjectURL(file));
+    setPreviews((prev) => [...prev, ...newPreviews]);
+  };
+
+  const removeImage = (index) => {
+    setSelectedFiles(selectedFiles.filter((_, i) => i !== index));
+    setPreviews(previews.filter((_, i) => i !== index));
   };
 
   const handleSubmit = async (e) => {
@@ -27,22 +44,28 @@ const AddProduct = () => {
     setLoading(true);
 
     try {
-      // Step 1: Create Product Entry
-      const product = await createProduct(formData);
-      setProductId(product.id);
+      // 1. Prepare Payload exactly as per your API Schema
+      const payload = {
+        ...formData,
+        price: parseFloat(formData.price),
+        category: formData.category.toUpperCase()
+      };
 
-      // Step 2: If images exist, upload them
-      if (files.length > 0) {
+      // 2. Step 1: Create Product Entry
+      const product = await createProduct(payload);
+
+      // 3. Step 2: Upload Images if selected
+      if (selectedFiles.length > 0) {
         const imageFormData = new FormData();
-        files.forEach((file) => imageFormData.append("images", file));
+        selectedFiles.forEach((file) => imageFormData.append("images", file));
         await uploadProductImages(product.id, imageFormData);
       }
 
-      alert("Product listed successfully!");
+      alert("Product successfully listed on Namaste Tractor!");
       navigate("/products");
     } catch (err) {
-      console.error(err);
-      alert("Failed to list product. Please check your data.");
+      console.error("Submission Error:", err.response?.data);
+      alert(`Error: ${err.response?.data?.message || "Please check all fields"}`);
     } finally {
       setLoading(false);
     }
@@ -52,108 +75,107 @@ const AddProduct = () => {
     <div className="bg-slate-50 min-h-screen pb-20">
       <Navbar />
       
-      <div className="max-w-3xl mx-auto px-4 mt-12">
-        <div className="bg-white rounded-3xl shadow-xl overflow-hidden">
-          <div className="bg-green-600 p-8 text-white text-center">
-            <h1 className="text-3xl font-bold">List Your Product</h1>
-            <p className="text-green-100 mt-2">Fill in the details to reach thousands of farmers</p>
+      <div className="max-w-4xl mx-auto px-4 mt-10">
+        <div className="bg-white rounded-[2rem] shadow-2xl shadow-slate-200/50 overflow-hidden border border-gray-100">
+          <div className="bg-green-600 p-10 text-white">
+            <h1 className="text-3xl font-black">Sell Your Product</h1>
+            <p className="text-green-100 mt-2 opacity-90">Enter accurate details to attract genuine buyers.</p>
           </div>
 
-          <form onSubmit={handleSubmit} className="p-8 md:p-12 space-y-6">
+          <form onSubmit={handleSubmit} className="p-8 md:p-12 space-y-8">
+            {/* Section 1: Basic Info */}
             <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-              {/* Product Name */}
               <div className="md:col-span-2">
-                <label className="block text-sm font-bold text-gray-700 mb-2">Product Name</label>
-                <input 
-                  type="text" required
+                <label className="block text-sm font-bold text-gray-700 mb-2">Product Name *</label>
+                <input name="productName" type="text" required onChange={handleChange}
                   className="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-green-500 outline-none transition"
-                  placeholder="e.g. Massey Ferguson 7250"
-                  onChange={(e) => setFormData({...formData, productName: e.target.value})}
-                />
+                  placeholder="e.g. Swaraj 744 FE 2022 Model" />
               </div>
 
-              {/* Price */}
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">Price (₹)</label>
-                <input 
-                  type="number" required
+                <label className="block text-sm font-bold text-gray-700 mb-2">Price (₹) *</label>
+                <input name="price" type="number" required onChange={handleChange}
                   className="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-green-500 outline-none transition"
-                  placeholder="210000"
-                  onChange={(e) => setFormData({...formData, price: e.target.value})}
-                />
+                  placeholder="550000" />
               </div>
 
-              {/* Unit */}
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">Unit</label>
-                <input 
-                  type="text" required
+                <label className="block text-sm font-bold text-gray-700 mb-2">Unit *</label>
+                <input name="unit" type="text" required onChange={handleChange}
                   className="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-green-500 outline-none transition"
-                  placeholder="per unit / per acre"
-                  onChange={(e) => setFormData({...formData, unit: e.target.value})}
-                />
+                  placeholder="e.g. Total, Per Hour, Per Acre" />
+              </div>
+            </div>
+
+            {/* Section 2: Contact & Location */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">Phone Number *</label>
+                <input name="phone" type="tel" required onChange={handleChange}
+                  className="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-green-500 outline-none transition"
+                  placeholder="10 digit mobile number" />
               </div>
 
-              {/* Category */}
               <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">City *</label>
+                <input name="city" type="text" required onChange={handleChange}
+                  className="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-green-500 outline-none transition"
+                  placeholder="Gondia / Nagpur" />
+              </div>
+
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-2">Pincode *</label>
+                <input name="pincode" type="text" required onChange={handleChange}
+                  className="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-green-500 outline-none transition"
+                  placeholder="441601" />
+              </div>
+            </div>
+
+            {/* Section 3: Category & Description */}
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+               <div className="md:col-span-1">
                 <label className="block text-sm font-bold text-gray-700 mb-2">Category</label>
-                <select 
-                  className="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-green-500 outline-none transition"
-                  onChange={(e) => setFormData({...formData, category: e.target.value})}
-                >
-                  <option value="MACHINERY">MACHINERY</option>
-                  <option value="CROP">CROP</option>
-                  <option value="VEGETABLE">VEGETABLE</option>
+                <select name="category" onChange={handleChange}
+                  className="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-green-500 outline-none transition">
+                  <option value="MACHINERY">Machinery</option>
+                  <option value="CROP">Crop</option>
+                  <option value="VEGETABLE">Vegetable</option>
                 </select>
               </div>
-
-              {/* City */}
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-2">City</label>
-                <input 
-                  type="text" required
-                  className="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-green-500 outline-none transition"
-                  placeholder="Gondia"
-                  onChange={(e) => setFormData({...formData, city: e.target.value})}
-                />
+              <div className="md:col-span-2">
+                <label className="block text-sm font-bold text-gray-700 mb-2">Description *</label>
+                <textarea name="description" required onChange={handleChange}
+                  className="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-green-500 outline-none transition h-20"
+                  placeholder="Describe condition, usage hours, or crop quality..."></textarea>
               </div>
             </div>
 
-            {/* Description */}
+            {/* Section 4: Production-Ready Image Upload */}
             <div>
-              <label className="block text-sm font-bold text-gray-700 mb-2">Description</label>
-              <textarea 
-                className="w-full p-4 bg-gray-50 border border-gray-200 rounded-2xl focus:ring-2 focus:ring-green-500 outline-none transition h-32"
-                placeholder="Describe the condition, usage, and any other details..."
-                onChange={(e) => setFormData({...formData, description: e.target.value})}
-              ></textarea>
+              <label className="block text-sm font-bold text-gray-700 mb-4 text-center">Product Images (Main image first)</label>
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4 mb-4">
+                {previews.map((src, index) => (
+                  <div key={index} className="relative group aspect-square rounded-2xl overflow-hidden border-2 border-green-100 shadow-sm">
+                    <img src={src} alt="Preview" className="w-full h-full object-cover" />
+                    <button type="button" onClick={() => removeImage(index)}
+                      className="absolute top-2 right-2 bg-red-500 text-white w-6 h-6 rounded-full text-xs font-bold shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
+                      ✕
+                    </button>
+                    {index === 0 && <span className="absolute bottom-0 inset-x-0 bg-green-600/80 text-white text-[10px] py-1 text-center font-bold">MAIN</span>}
+                  </div>
+                ))}
+                
+                <label className="flex flex-col items-center justify-center aspect-square border-2 border-dashed border-gray-300 rounded-2xl cursor-pointer hover:bg-green-50 hover:border-green-300 transition-all group">
+                  <input type="file" multiple accept="image/*" className="hidden" onChange={handleFileChange} />
+                  <span className="text-3xl group-hover:scale-125 transition-transform">📸</span>
+                  <span className="text-[10px] font-bold text-gray-400 mt-2">ADD IMAGE</span>
+                </label>
+              </div>
             </div>
 
-            {/* Image Upload */}
-            <div className="border-2 border-dashed border-gray-200 rounded-3xl p-8 text-center bg-gray-50">
-              <input 
-                type="file" multiple accept="image/*"
-                id="file-upload" className="hidden"
-                onChange={handleFileChange}
-              />
-              <label htmlFor="file-upload" className="cursor-pointer">
-                <span className="text-4xl mb-2 block">📸</span>
-                <span className="text-green-600 font-bold">Click to upload images</span>
-                <p className="text-xs text-gray-400 mt-1">First image will be the main cover</p>
-              </label>
-              {files.length > 0 && (
-                <div className="mt-4 text-sm font-medium text-gray-600">
-                  {files.length} images selected
-                </div>
-              )}
-            </div>
-
-            <button 
-              type="submit" 
-              disabled={loading}
-              className="w-full bg-green-600 text-white font-bold py-5 rounded-2xl hover:bg-green-700 transition shadow-xl shadow-green-100 disabled:opacity-50"
-            >
-              {loading ? "Processing..." : "Submit Listing"}
+            <button type="submit" disabled={loading}
+              className="w-full bg-green-600 text-white font-black py-5 rounded-2xl hover:bg-green-700 transition-all shadow-xl shadow-green-100 disabled:opacity-50 text-lg uppercase tracking-wider">
+              {loading ? "Publishing Listing..." : "Verify & Post Now"}
             </button>
           </form>
         </div>

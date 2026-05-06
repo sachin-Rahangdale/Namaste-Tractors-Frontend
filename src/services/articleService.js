@@ -22,3 +22,15 @@ export const getArticleBySlug = async (slug) => {
     throw error;
   }
 };
+
+
+export const getArticleComments = async (id, page = 0, size = 10) => {
+  const res = await api.get(`/articles/${id}/comments`, { params: { page, size } });
+  return res.data;
+};
+
+export const postComment = async (id, commentData) => {
+  const res = await api.post(`/articles/${id}/comments`, commentData);
+  return res.data;
+};
+

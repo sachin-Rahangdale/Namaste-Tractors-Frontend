@@ -7,38 +7,50 @@ import Tractors from "./pages/Tractors";
 import Auth from "./pages/Auth";
 import Articles from "./pages/Articles";
 import Products from "./pages/Products";
-import MyProducts from "./pages/MyProducts"; // Ensure this is created
+import MyProducts from "./pages/MyProducts"; 
 import AddProduct from "./pages/AddProduct";
+import ArticleDetail from "./pages/ArticleDetail";
+import Footer from "./component/layout/Footer";
 
 function App() {
-  const { user } = useContext(AuthContext); //
+  const { user } = useContext(AuthContext);
 
   return (
-    <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={user ? <Navigate to="/" /> : <Auth />} />
-      <Route path="/tractors" element={<Tractors />} />
-      <Route path="/tractor/:id" element={<TractorDetail />} />
-      <Route path="/articles" element={<Articles/>} />
-      <Route path="/article/:slug" element={<div>Article Detail Page</div>} />
-      
-      {/* Product Routes */}
-      <Route path="/products" element={<Products/>} />
-      
-      {/* Protected Routes: Redirect to login if user object is null */}
-      <Route 
-        path="/products/my" 
-        element={user ? <MyProducts /> : <Navigate to="/login" />} 
-      />
-      
+    <div className="flex flex-col min-h-screen">
+      {/* 
+          The 'flex-grow' div ensures the main content expands 
+          to push the footer to the bottom of the screen.
+      */}
+      <div className="flex-grow">
+        <Routes>
+          <Route path="/" element={<Home />} />
+          <Route path="/login" element={user ? <Navigate to="/" /> : <Auth />} />
+          <Route path="/tractors" element={<Tractors />} />
+          <Route path="/tractor/:id" element={<TractorDetail />} />
+          <Route path="/articles" element={<Articles/>} />
+          <Route path="/article/:slug" element={<ArticleDetail/>} />
+          
+          <Route path="/products" element={<Products/>} />
+          
+          <Route 
+            path="/products/my" 
+            element={user ? <MyProducts /> : <Navigate to="/login" />} 
+          />
+          
+          <Route path="/product/:id" element={<div>Product Detail Page</div>} />
+          
+          <Route 
+               path="/products/new" 
+               element={user ? <AddProduct /> : <Navigate to="/login" />} 
+          />
+          
+          <Route path="*" element={<Navigate to="/" />} />
+        </Routes>
+      </div>
 
-      <Route path="/product/:id" element={<div>Product Detail Page</div>} />
-      <Route path="*" element={<Navigate to="/" />} />
-      <Route 
-           path="/products/new" 
-           element={user ? <AddProduct /> : <Navigate to="/login" />} 
-      />
-    </Routes>
+      {/* Global Footer */}
+      <Footer />
+    </div>
   );
 }
 

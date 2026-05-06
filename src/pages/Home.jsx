@@ -8,6 +8,7 @@ import ProductCard from "../component/cards/ProductCard";
 import EnquiryForm from "../component/common/EnquiryForm";
 import Navbar from "../component/layout/Navbar";
 import { Link } from "react-router-dom";
+import Footer from "../component/layout/Footer";
 
 const Home = () => {
   const [tractors, setTractors] = useState([]);
@@ -101,6 +102,7 @@ const Home = () => {
 
         {/* Enquiry Form */}
         <EnquiryForm />
+        
       </main>
     </div>
   );
