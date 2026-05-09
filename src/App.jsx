@@ -12,44 +12,68 @@ import AddProduct from "./pages/AddProduct";
 import ArticleDetail from "./pages/ArticleDetail";
 import Footer from "./component/layout/Footer";
 
+// Admin Imports
+import AdminLayout from "./routes/AdminLayout";
+import AdminHome from "./pages/admin/AdminHome";
+import ProductDetail from "./pages/ProductDetail";
+import ManageEnquiries from "./pages/Admin/ManageEnquiries";
+import ManageBrands from "./pages/Admin/ManageBrands";
+import ManageTractors from "./pages/Admin/ManageTractors";
+import TractorForm from "./component/TractorForm";
+
 function App() {
   const { user } = useContext(AuthContext);
 
+  // Helper to check for Admin role - crucial for backend security
+  const isAdmin = user?.role === "ADMIN";
+
   return (
     <div className="flex flex-col min-h-screen">
-      {/* 
-          The 'flex-grow' div ensures the main content expands 
-          to push the footer to the bottom of the screen.
-      */}
       <div className="flex-grow">
         <Routes>
+          {/* PUBLIC & USER ROUTES */}
           <Route path="/" element={<Home />} />
           <Route path="/login" element={user ? <Navigate to="/" /> : <Auth />} />
           <Route path="/tractors" element={<Tractors />} />
           <Route path="/tractor/:id" element={<TractorDetail />} />
           <Route path="/articles" element={<Articles/>} />
           <Route path="/article/:slug" element={<ArticleDetail/>} />
-          
           <Route path="/products" element={<Products/>} />
           
           <Route 
             path="/products/my" 
             element={user ? <MyProducts /> : <Navigate to="/login" />} 
           />
-          
-          <Route path="/product/:id" element={<div>Product Detail Page</div>} />
-          
+          <Route path="/product/:id" element={<ProductDetail/>} />
           <Route 
-               path="/products/new" 
-               element={user ? <AddProduct /> : <Navigate to="/login" />} 
+            path="/products/new" 
+            element={user ? <AddProduct /> : <Navigate to="/login" />} 
           />
+
+          {/* ADMIN ROUTES (Nested) */}
+          {/* We hide the footer for Admin pages to give it a professional dashboard feel */}
+          <Route 
+            path="/admin" 
+            element={isAdmin ? <AdminLayout /> : <Navigate to="/login" />}
+          >
+            <Route index element={<AdminHome />} />
+            <Route path="tractors" element={<ManageTractors/>} />
+            <Route path="tractors/new" element={<TractorForm />} />
+    <Route path="tractors/edit/:id" element={<TractorForm />} />
+            <Route path="articles" element={<div>Manage Articles Page</div>} />
+            <Route path="products" element={<div>Manage Products Page</div>} />
+            <Route path="enquiries" element={<ManageEnquiries/>} />
+            <Route path="brands" element={<ManageBrands/>} />
+          </Route>
+          
           
           <Route path="*" element={<Navigate to="/" />} />
         </Routes>
       </div>
 
-      {/* Global Footer */}
-      <Footer />
+      {/* Global Footer - Only visible on non-admin routes */}
+      {/* Logic: If the URL doesn't start with /admin, show footer */}
+      {!window.location.pathname.startsWith("/admin") && <Footer />}
     </div>
   );
 }
