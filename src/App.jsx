@@ -19,7 +19,10 @@ import ProductDetail from "./pages/ProductDetail";
 import ManageEnquiries from "./pages/Admin/ManageEnquiries";
 import ManageBrands from "./pages/Admin/ManageBrands";
 import ManageTractors from "./pages/Admin/ManageTractors";
-import TractorForm from "./component/TractorForm";
+import TractorForm from "./component/admin/TractorForm";
+import ManageArticles from "./pages/Admin/ManageArticles";
+import ManageProducts from "./pages/Admin/ManageProduct";
+
 
 function App() {
   const { user } = useContext(AuthContext);
@@ -60,8 +63,8 @@ function App() {
             <Route path="tractors" element={<ManageTractors/>} />
             <Route path="tractors/new" element={<TractorForm />} />
     <Route path="tractors/edit/:id" element={<TractorForm />} />
-            <Route path="articles" element={<div>Manage Articles Page</div>} />
-            <Route path="products" element={<div>Manage Products Page</div>} />
+            <Route path="articles" element={<ManageArticles/>} />
+            <Route path="products" element={<ManageProducts/>} />
             <Route path="enquiries" element={<ManageEnquiries/>} />
             <Route path="brands" element={<ManageBrands/>} />
           </Route>
