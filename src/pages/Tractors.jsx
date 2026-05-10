@@ -470,37 +470,6 @@ const Tractors = () => {
               )}
             </main>
           )}
-
-         {/* ── ENQUIRY SECTION ──────────────────────────────────────────────── */}
-<section className="mt-12">
-  <div className="bg-green-100 border border-green-100 rounded-3xl p-8 flex flex-col lg:flex-row items-center gap-8">
-    
-    {/* Left */}
-    <div className="lg:w-1/2 text-center lg:text-left">
-      <h2 className="text-2xl font-bold text-gray-900">
-        Can't Find the Right Tractor?
-      </h2>
-      <p className="text-gray-500 text-sm mt-2 max-w-sm">
-        Our experts help with on-road pricing, loan options, and
-        government subsidy schemes — tailored to your farm.
-      </p>
-      <div className="flex flex-wrap gap-3 mt-4 justify-center lg:justify-start">
-        {["✓ Free consultation", "✓ Subsidy guidance", "✓ Loan assistance"].map(f => (
-          <span key={f} className="text-xs font-semibold text-green-700">{f}</span>
-        ))}
-      </div>
-    </div>
-
-    {/* Form */}
-    <div className="lg:w-1/2 w-full bg-white rounded-2xl p-6 border border-green-100 shadow-sm">
-      <EnquiryForm
-        defaultType="tractor"
-        defaultMessage="I am interested in purchasing a new tractor and would like expert guidance."
-      />
-    </div>
-
-  </div>
-</section>
         </div>
       </div>
     </>

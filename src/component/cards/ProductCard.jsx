@@ -1,44 +1,51 @@
 import React from 'react';
 import { useNavigate } from "react-router-dom";
 
-const ProductCard = ({ data }) => {
+const ProductCard = ({ data, categoryMeta }) => {
   const navigate = useNavigate();
+  const accent = categoryMeta?.accent ?? "#0F3D2E";
 
   return (
-    <div 
+    <div
       onClick={() => navigate(`/product/${data.id}`)}
-      className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer hover:shadow-md transition-all h-full flex flex-col"
+      className="bg-white p-3 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col h-full group rounded-sm cursor-pointer"
+      onMouseEnter={(e) => e.currentTarget.style.borderColor = accent}
+      onMouseLeave={(e) => e.currentTarget.style.borderColor = '#e5e7eb'}
     >
-      <div className="relative">
-        <img 
-          src={data.imageUrl || 'https://via.placeholder.com/300x200?text=No+Image'} 
-          alt={data.productName} 
-          className="w-full h-40 object-cover"
+      {/* Rectangle Image */}
+      <div className="w-full aspect-[16/9] overflow-hidden bg-gray-50 mb-3 rounded-sm">
+        <img
+          src={data.imageUrl || "https://placehold.co/400x300/f3f4f6/9ca3af?text=No+Image"}
+          alt={data.productName}
+          className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
         />
-        <span className="absolute top-2 right-2 bg-black/70 text-white text-[10px] px-2 py-1 rounded uppercase tracking-wider">
-          {data.category}
-        </span>
       </div>
-      
-      <div className="p-4 flex flex-col flex-grow">
-        <h3 className="font-bold text-gray-800 capitalize mb-1">
+
+      {/* Content */}
+      <div className="flex flex-col flex-grow px-1">
+        <h3
+          className="text-sm font-semibold text-gray-900 capitalize leading-snug mb-1 transition-colors group-hover:text-[var(--accent)]"
+          style={{ "--accent": accent }}
+        >
           {data.productName}
         </h3>
-        
-        <div className="flex items-center text-gray-500 text-xs mb-3">
-          <span className="mr-1">📍</span> {data.city}
-        </div>
 
-        <div className="mt-auto flex justify-between items-end">
-          <div>
-            <p className="text-xs text-gray-400">Price</p>
-            <p className="text-lg font-bold text-blue-600">
-              ₹{data.price.toLocaleString()} <span className="text-xs font-normal text-gray-500">/{data.unit}</span>
-            </p>
-          </div>
-          <button className="bg-gray-100 p-2 rounded-full hover:bg-blue-50 transition-colors">
-            ➔
-          </button>
+        <p className="text-xs text-gray-400 flex items-center gap-1 mb-3">
+          <svg className="w-3 h-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+          </svg>
+          {data.city}
+        </p>
+
+        {/* Price */}
+        <div className="mt-auto pt-2 border-t border-gray-100 flex items-center justify-between">
+          <p className="text-base font-bold leading-none" style={{ color: accent }}>
+            ₹{data.price.toLocaleString()}
+          </p>
+          <span className="text-[11px] text-gray-500 font-medium bg-gray-50 px-2 py-0.5 rounded-sm">
+            per {data.unit}
+          </span>
         </div>
       </div>
     </div>

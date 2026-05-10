@@ -2,6 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../component/layout/Navbar";
 import { createProduct, uploadProductImages } from "../services/productService";
+import imageCompression from "browser-image-compression";
 
 const AddProduct = () => {
   const navigate = useNavigate();
@@ -19,6 +20,8 @@ const AddProduct = () => {
     description: "",
     category: "MACHINERY"
   });
+
+  
 
   // Handle Text Inputs
   const handleChange = (e) => {

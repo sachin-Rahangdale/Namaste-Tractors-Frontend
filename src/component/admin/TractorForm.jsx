@@ -3,12 +3,101 @@ import { useRef, useState } from "react";
 const IMAGE_TYPES = ["MAIN", "GALLERY"];
 
 const SPEC_FIELDS = [
-  { key: "clutch", label: "Clutch", type: "text" },
-  { key: "steering", label: "Steering", type: "text" },
-  { key: "gearbox", label: "Gearbox", type: "text" },
-  { key: "brakes", label: "Brakes", type: "text" },
-  { key: "torque", label: "Torque", type: "number" },
-  { key: "ptoHp", label: "PTO HP", type: "text" },
+  {
+    key: "cylinder",
+    label: "Cylinder",
+    type: "number",
+  },
+
+  {
+    key: "engineCapacity",
+    label: "Engine Capacity (CC)",
+    type: "number",
+  },
+
+  {
+    key: "clutch",
+    label: "Clutch",
+    type: "text",
+  },
+
+  {
+    key: "steering",
+    label: "Steering",
+    type: "text",
+  },
+
+  {
+    key: "gearbox",
+    label: "Gearbox",
+    type: "text",
+  },
+
+  {
+    key: "brakes",
+    label: "Brakes",
+    type: "text",
+  },
+
+  {
+    key: "torque",
+    label: "Torque",
+    type: "number",
+  },
+
+  {
+    key: "backupTorque",
+    label: "Backup Torque",
+    type: "number",
+  },
+
+  {
+    key: "ptoHp",
+    label: "PTO HP",
+    type: "text",
+  },
+
+  {
+    key: "ptoOptions",
+    label: "PTO Options",
+    type: "text",
+  },
+
+  {
+    key: "frontTyre",
+    label: "Front Tyre",
+    type: "text",
+  },
+
+  {
+    key: "rearTyre",
+    label: "Rear Tyre",
+    type: "text",
+  },
+
+  {
+    key: "rearAxle",
+    label: "Rear Axle",
+    type: "text",
+  },
+
+  {
+    key: "frontAxle",
+    label: "Front Axle",
+    type: "text",
+  },
+
+  {
+    key: "reduction",
+    label: "Reduction",
+    type: "text",
+  },
+
+  {
+    key: "serviceInterval",
+    label: "Service Interval",
+    type: "number",
+  },
 ];
 
 export default function TractorForm({
@@ -44,6 +133,7 @@ export default function TractorForm({
       },
     }));
 
+
 const handleFiles = (files) => {
   const hasMainAlready =
     images.some(
@@ -72,6 +162,7 @@ const handleFiles = (files) => {
     ...newImgs,
   ]);
 };
+
 
 
   const removeImage = (id) =>

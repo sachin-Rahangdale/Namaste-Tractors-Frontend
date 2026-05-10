@@ -11,11 +11,12 @@ import {
 
 import api from "../../api/axios";
 
-
-import TractorTable from "../../component/admin/TractorTable";
 import TractorForm from "../../component/admin/TractorForm";
+import TractorTable from "../../component/admin/TractorTable";
 
 const EMPTY_SPEC = {
+  cylinder: "",
+  engineCapacity: "",
   clutch: "",
   steering: "",
   gearbox: "",
@@ -98,27 +99,133 @@ export default function ManageTractors() {
       )
     : tractors;
 
-  const handleAdd = async (form, images) => {
-    try {
-      const tractor = await createTractor(form);
+  const handleAdd = async (
+  form,
+  images
+) => {
+  try {
 
-      for (const img of images) {
-        if (img.file) {
-          await uploadTractorImage(
-            tractor.id,
-            img.file,
-            img.type
-          );
-        }
+    const payload = {
+      model: form.model,
+
+      hp: Number(form.hp),
+
+      price: Number(form.price),
+
+      brandId: Number(
+        form.brandId
+      ),
+
+      specification: {
+        cylinder: Number(
+          form.specification
+            .cylinder
+        ),
+
+        engineCapacity:
+          Number(
+            form
+              .specification
+              .engineCapacity
+          ),
+
+        clutch:
+          form.specification
+            .clutch,
+
+        steering:
+          form.specification
+            .steering,
+
+        gearbox:
+          form.specification
+            .gearbox,
+
+        brakes:
+          form.specification
+            .brakes,
+
+        torque: Number(
+          form.specification
+            .torque
+        ),
+
+        backupTorque:
+          Number(
+            form
+              .specification
+              .backupTorque
+          ),
+
+        ptoHp:
+          form.specification
+            .ptoHp,
+
+        ptoOptions:
+          form.specification
+            .ptoOptions,
+
+        frontTyre:
+          form.specification
+            .frontTyre,
+
+        rearTyre:
+          form.specification
+            .rearTyre,
+
+        rearAxle:
+          form.specification
+            .rearAxle,
+
+        frontAxle:
+          form.specification
+            .frontAxle,
+
+        reduction:
+          form.specification
+            .reduction,
+
+        serviceInterval:
+          Number(
+            form
+              .specification
+              .serviceInterval
+          ),
+      },
+    };
+
+    console.log(payload);
+
+    const tractor =
+      await createTractor(
+        payload
+      );
+
+    for (const img of images) {
+
+      if (img.file) {
+
+        await uploadTractorImage(
+          tractor.id,
+          img.file,
+          img.type
+        );
       }
-
-      setShowForm(false);
-
-      load();
-    } catch (e) {
-      console.error(e);
     }
-  };
+
+    setShowForm(false);
+
+    load();
+
+  } catch (e) {
+
+    console.error(e);
+
+    console.log(
+      e.response?.data
+    );
+  }
+};
 
   const openEdit = async (tractor) => {
     try {

@@ -1,26 +1,25 @@
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../component/layout/Navbar";
-import Card from "../component/cards/Card"; 
+import ArticleCard from "../component/cards/ArticleCard";
 import EnquiryForm from "../component/common/EnquiryForm";
-// Added missing service imports
-import { 
-  getArticleBySlug, 
-  getArticleComments, 
-  getArticles,  
-  postComment 
+import {
+  getArticleBySlug,
+  getArticleComments,
+  getArticles,
+  postComment,
 } from "../services/articleService";
 
 const ArticleDetail = () => {
-  const { slug } = useParams(); // Using slug from URL
+  const { slug } = useParams();
   const navigate = useNavigate();
-  
-  const [article, setArticle] = useState(null);
-  const [comments, setComments] = useState([]);
-  const [relatedArticles, setRelatedArticles] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [page, setPage] = useState(0);
-  const [newComment, setNewComment] = useState({ name: "", content: "" });
+
+  const [article, setArticle]           = useState(null);
+  const [comments, setComments]         = useState([]);
+  const [relatedArticles, setRelated]   = useState([]);
+  const [loading, setLoading]           = useState(true);
+  const [newComment, setNewComment]     = useState({ name: "", content: "" });
+  const [submitting, setSubmitting]     = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -30,17 +29,14 @@ const ArticleDetail = () => {
   const loadData = async () => {
     setLoading(true);
     try {
-      // Fetch article by slug
       const data = await getArticleBySlug(slug);
       setArticle(data);
-      
-      // Fetch initial comments
+
       const commentData = await getArticleComments(data.id, 0, 10);
       setComments(commentData.content || []);
-      
-      // Fetch related articles
-      const related = await getArticles(0, 6);
-      setRelatedArticles(related.content.filter(a => a.id !== data.id));
+
+      const related = await getArticles(0, 4);
+      setRelated((related.content || []).filter((a) => a.id !== data.id).slice(0, 3));
     } catch (err) {
       console.error("Error loading article:", err);
     } finally {
@@ -50,182 +46,314 @@ const ArticleDetail = () => {
 
   const handleCommentSubmit = async (e) => {
     e.preventDefault();
+    setSubmitting(true);
     try {
-      await postComment(article.id, newComment); // Post new comment
+      await postComment(article.id, newComment);
       setNewComment({ name: "", content: "" });
-      // Refresh comments
       const commentData = await getArticleComments(article.id, 0, 10);
-      setComments(commentData.content);
-    } catch (err) {
-      alert("Failed to post comment");
+      setComments(commentData.content || []);
+    } catch {
+      alert("Failed to post comment. Please try again.");
+    } finally {
+      setSubmitting(false);
     }
   };
 
-  const handleLoadMore = async () => {
-    const nextPage = page + 1;
-    try {
-      const res = await getArticles(nextPage, 4);
-      setRelatedArticles([...relatedArticles, ...res.content]);
-      setPage(nextPage);
-    } catch (err) {
-      console.error(err);
-    }
-  };
+  /* ── Loading ── */
+  if (loading) {
+    return (
+      <div className="h-screen bg-slate-50 flex flex-col items-center justify-center gap-4">
+        <div className="flex gap-2">
+          {[0, 1, 2].map((i) => (
+            <div
+              key={i}
+              className="w-3 h-3 bg-green-600 rounded-full animate-bounce"
+              style={{ animationDelay: `${i * -0.15}s` }}
+            />
+          ))}
+        </div>
+        <p className="text-slate-400 font-black text-[10px] uppercase tracking-widest">
+          Loading Article...
+        </p>
+      </div>
+    );
+  }
 
-  if (loading) return <div className="h-screen flex items-center justify-center animate-pulse text-green-600 font-bold text-xl uppercase tracking-widest">Loading Namaste Tractor Insights...</div>;
-  if (!article) return <div className="text-center py-20 font-bold text-red-500">Article not found.</div>;
+  /* ── Not found ── */
+  if (!article) {
+    return (
+      <div className="min-h-screen bg-slate-50 flex flex-col">
+        <Navbar />
+        <div className="flex-grow flex items-center justify-center">
+          <div className="text-center space-y-4">
+            <h2 className="text-4xl font-black text-slate-900 uppercase italic tracking-tighter">
+              Article Not Found
+            </h2>
+            <p className="text-slate-400 font-medium text-sm">
+              This article doesn't exist or has been removed.
+            </p>
+            <button
+              onClick={() => navigate("/articles")}
+              className="mt-4 bg-slate-900 hover:bg-green-600 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all"
+            >
+              Back to Insights →
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
 
-  // Interleave logic: 1 image every 2 paragraphs, remaining before last para
+  const isValidDate =
+    article.createdAt && new Date(article.createdAt).getFullYear() > 2000;
+
+  /* ── Render body content, weaving in gallery images ── */
   const renderContent = () => {
-    const paragraphs = article.content.split('\n').filter(p => p.trim() !== "");
-    const galleryImages = [...(article.images || [])];
-    const contentElements = [];
+    const paragraphs = article.content.split("\n").filter((p) => p.trim() !== "");
+    const gallery = [...(article.images || [])];
+    const elements = [];
 
-    paragraphs.forEach((para, index) => {
-      contentElements.push(
-        <p key={`p-${index}`} className="text-gray-700 text-lg leading-relaxed mb-8">
+    paragraphs.forEach((para, idx) => {
+      elements.push(
+        <p key={`p-${idx}`} className="text-slate-700 text-base md:text-lg leading-relaxed mb-6">
           {para}
         </p>
       );
-
-      // Rule: Every 2 paragraphs, insert 1 image
-      if ((index + 1) % 2 === 0 && galleryImages.length > 0) {
-        const imgUrl = galleryImages.shift();
-        contentElements.push(
-          <div key={`img-${index}`} className="my-10 rounded-[2rem] overflow-hidden shadow-2xl border border-gray-100">
-            <img src={imgUrl} alt="Visual Detail" className="w-full h-full object-cover" />
+      if ((idx + 1) % 2 === 0 && gallery.length > 0) {
+        const imgUrl = gallery.shift();
+        elements.push(
+          <div key={`img-${idx}`} className="my-10 rounded-[2rem] overflow-hidden border border-slate-100 shadow-md aspect-video">
+            <img src={imgUrl} alt="" className="w-full h-full object-cover" />
           </div>
         );
       }
-
-      // Rule: Remaining images before the final paragraph
-      if (index === paragraphs.length - 2 && galleryImages.length > 0) {
-        while (galleryImages.length > 0) {
-          const imgUrl = galleryImages.shift();
-          contentElements.push(
-            <div key={`remaining-${galleryImages.length}`} className="my-10 rounded-[2rem] overflow-hidden shadow-xl border-4 border-white">
-              <img src={imgUrl} alt="Additional Detail" className="w-full h-full object-cover" />
-            </div>
-          );
-        }
-      }
     });
 
-    return contentElements;
+    while (gallery.length > 0) {
+      const imgUrl = gallery.shift();
+      elements.push(
+        <div key={`rem-${gallery.length}`} className="my-10 rounded-[2rem] overflow-hidden border border-slate-100 shadow-md aspect-video">
+          <img src={imgUrl} alt="" className="w-full h-full object-cover" />
+        </div>
+      );
+    }
+
+    return elements;
   };
 
   return (
-    <div className="bg-slate-50 min-h-screen">
+    <div className="bg-slate-50 min-h-screen pb-32">
       <Navbar />
 
-      <article className="max-w-5xl mx-auto px-4 py-12">
-        {/* HEADER */}
-        <header className="mb-16 text-center">
-          <div className="flex items-center justify-center gap-4 mb-8">
-            <span className="bg-green-600 text-white px-6 py-2 rounded-full text-xs font-black uppercase tracking-widest shadow-lg shadow-green-100">
-               Market Analysis
-            </span>
-            <span className="text-gray-400 font-bold text-sm">
-              {new Date().toLocaleDateString()}
-            </span>
+      {/* ── BREADCRUMB ── */}
+      <div className="max-w-7xl mx-auto px-4 lg:px-10 py-5">
+        <div className="flex items-center gap-2 text-[10px] font-black text-slate-400 uppercase tracking-widest">
+          <button onClick={() => navigate("/")} className="hover:text-green-600 transition-colors">Home</button>
+          <span className="opacity-30">/</span>
+          <button onClick={() => navigate("/articles")} className="hover:text-green-600 transition-colors">Articles</button>
+          <span className="opacity-30">/</span>
+          <span className="text-slate-700 line-clamp-1 lowercase">{article.title}</span>
+        </div>
+      </div>
+
+      <main className="max-w-5xl mx-auto px-4 lg:px-10 space-y-10">
+
+        {/* ══════════════ HERO ══════════════ */}
+        <header className="space-y-6">
+          {/* Category & Meta */}
+          <div className="flex flex-wrap items-center gap-3">
+            {article.category && (
+              <span className="text-[9px] font-black uppercase tracking-[0.3em] text-green-600 bg-green-50 border border-green-100 px-4 py-2 rounded-xl">
+                {article.category}
+              </span>
+            )}
+            {isValidDate && (
+              <span className="text-[9px] font-black uppercase tracking-widest text-slate-400">
+                {new Date(article.createdAt).toLocaleDateString("en-IN", {
+                  day: "numeric", month: "long", year: "numeric",
+                })}
+              </span>
+            )}
           </div>
-          <h1 className="text-5xl md:text-6xl font-black text-slate-900 leading-[1.1] mb-12 tracking-tighter">
+
+          {/* Title */}
+          <h1 className="text-4xl md:text-5xl lg:text-6xl font-black text-slate-900 uppercase italic tracking-tighter leading-[0.95]">
             {article.title}
           </h1>
-          <div className="rounded-[3rem] overflow-hidden shadow-2xl border-8 border-white aspect-video mb-12 transform hover:scale-[1.01] transition duration-700">
-            <img src={article.mainImageUrl} alt={article.title} className="w-full h-full object-cover" />
-          </div>
+
+          {/* Author row */}
+          {article.author && (
+            <div className="flex items-center gap-3 pb-6 border-b border-slate-100">
+              <div className="w-9 h-9 rounded-xl bg-slate-900 text-white flex items-center justify-center text-xs font-black uppercase">
+                {article.author[0]}
+              </div>
+              <div>
+                <p className="text-xs font-black text-slate-900 uppercase tracking-wider">{article.author}</p>
+                <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Author</p>
+              </div>
+            </div>
+          )}
+
+          {/* Cover image */}
+          {article.mainImageUrl && (
+            <div className="rounded-[2.5rem] overflow-hidden border border-slate-100 shadow-xl shadow-slate-200/40 aspect-[16/8]">
+              <img
+                src={article.mainImageUrl}
+                alt={article.title}
+                className="w-full h-full object-cover"
+              />
+            </div>
+          )}
         </header>
 
-        {/* CONTENT */}
-        <div className="bg-white rounded-[4rem] p-10 md:p-20 shadow-xl border border-gray-100 mb-20 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-64 h-64 bg-green-50 rounded-full -mr-32 -mt-32 opacity-50"></div>
-          <div className="relative z-10">
-            {renderContent()}
-          </div>
+        {/* ══════════════ ARTICLE BODY ══════════════ */}
+        <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-lg shadow-slate-200/30 p-8 md:p-14">
+          {renderContent()}
         </div>
 
-        {/* COMMENT SECTION */}
-        <section className="mb-24 bg-white rounded-[3rem] p-10 shadow-lg border border-gray-100">
-          <h2 className="text-3xl font-black text-slate-900 mb-10 italic">Discussion ({comments.length})</h2>
-          
-          <form onSubmit={handleCommentSubmit} className="mb-12 space-y-4">
-            <input 
-              type="text" placeholder="Your Name" required
-              className="w-full p-4 bg-slate-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-green-500"
-              value={newComment.name}
-              onChange={(e) => setNewComment({...newComment, name: e.target.value})}
-            />
-            <textarea 
-              placeholder="Join the discussion..." required
-              className="w-full p-4 bg-slate-50 border border-gray-100 rounded-2xl outline-none focus:ring-2 focus:ring-green-500 h-32"
-              value={newComment.content}
-              onChange={(e) => setNewComment({...newComment, content: e.target.value})}
-            />
-            <button className="bg-slate-900 text-white px-10 py-4 rounded-2xl font-black uppercase tracking-widest hover:bg-green-600 transition shadow-lg">
-              Post Thought
-            </button>
-          </form>
-
-          <div className="space-y-6">
-            {comments.map((c) => (
-              <div key={c.id} className="p-6 bg-slate-50 rounded-3xl border-l-4 border-green-500">
-                <p className="font-black text-slate-900 mb-2 uppercase text-sm tracking-widest">{c.name}</p>
-                <p className="text-slate-600 leading-relaxed">{c.content}</p>
-                <p className="text-[10px] text-gray-400 mt-3 font-bold">{new Date(c.createdAt).toLocaleDateString()}</p>
-              </div>
-            ))}
+        {/* ══════════════ COMMENTS ══════════════ */}
+        <section>
+          <div className="flex items-center gap-5 mb-8">
+            <h2 className="text-3xl font-black text-slate-900 uppercase italic tracking-tighter leading-none">
+              Discussion
+            </h2>
+            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest bg-slate-100 px-3 py-1.5 rounded-xl">
+              {comments.length} {comments.length === 1 ? "comment" : "comments"}
+            </span>
+            <div className="h-px flex-1 bg-slate-100" />
           </div>
-        </section>
 
-        {/* RELATED ARTICLES */}
-        <section className="mb-24">
-          <div className="flex items-center justify-between mb-12">
-            <h2 className="text-4xl font-black text-slate-900 italic tracking-tighter">Recommended Reads</h2>
-            <div className="flex-grow h-[2px] bg-green-100 ml-8"></div>
+          {/* Comment Form */}
+          <div className="bg-white rounded-[2rem] border border-slate-100 shadow-lg shadow-slate-200/30 p-8 mb-8">
+            <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-6">
+              Leave a Comment
+            </p>
+            <form onSubmit={handleCommentSubmit} className="space-y-4">
+              <input
+                type="text"
+                placeholder="Your name"
+                required
+                value={newComment.name}
+                onChange={(e) => setNewComment({ ...newComment, name: e.target.value })}
+                className="w-full bg-slate-50 border border-slate-200 focus:border-green-500 outline-none text-slate-900 text-sm font-bold px-5 py-4 rounded-2xl transition-all"
+              />
+              <textarea
+                placeholder="Share your thoughts..."
+                required
+                rows={4}
+                value={newComment.content}
+                onChange={(e) => setNewComment({ ...newComment, content: e.target.value })}
+                className="w-full bg-slate-50 border border-slate-200 focus:border-green-500 outline-none text-slate-900 text-sm font-bold px-5 py-4 rounded-2xl transition-all resize-none"
+              />
+              <button
+                type="submit"
+                disabled={submitting}
+                className="bg-slate-900 hover:bg-green-600 disabled:opacity-50 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all"
+              >
+                {submitting ? "Posting..." : "Post Comment →"}
+              </button>
+            </form>
           </div>
-          
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-10">
-            {relatedArticles.map(a => (
-              <div key={a.id} className="group cursor-pointer bg-white p-4 rounded-[2.5rem] shadow-sm border border-gray-50 hover:shadow-xl transition duration-500" onClick={() => navigate(`/articles/${a.slug}`)}>
-                <div className="aspect-[4/3] rounded-[2rem] overflow-hidden mb-6">
-                  <img src={a.mainImageUrl} className="w-full h-full object-cover group-hover:scale-110 transition duration-700" alt={a.title} />
+
+          {/* Comment List */}
+          {comments.length > 0 ? (
+            <div className="space-y-4">
+              {comments.map((c) => (
+                <div key={c.id} className="bg-white rounded-[2rem] border border-slate-100 p-6 flex gap-5 shadow-sm">
+                  <div className="w-10 h-10 shrink-0 rounded-xl bg-slate-900 text-white flex items-center justify-center text-xs font-black uppercase">
+                    {c.name?.[0] || "A"}
+                  </div>
+                  <div className="flex-1">
+                    <div className="flex items-center gap-3 mb-2">
+                      <p className="text-xs font-black text-slate-900 uppercase tracking-wider">{c.name}</p>
+                      <span className="text-slate-200">·</span>
+                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
+                        {new Date(c.createdAt).toLocaleDateString("en-IN", {
+                          day: "numeric", month: "short",
+                        })}
+                      </p>
+                    </div>
+                    <p className="text-slate-600 text-sm leading-relaxed">{c.content}</p>
+                  </div>
                 </div>
-                <h3 className="text-xl font-black text-slate-800 line-clamp-2 leading-snug group-hover:text-green-600 transition px-2">
-                  {a.title}
-                </h3>
+              ))}
+            </div>
+          ) : (
+            <div className="text-center py-12 bg-white rounded-[2rem] border border-slate-100">
+              <p className="text-slate-300 text-4xl mb-3">💬</p>
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
+                No comments yet — be the first!
+              </p>
+            </div>
+          )}
+        </section>
+
+        {/* ══════════════ RELATED ARTICLES ══════════════ */}
+        {relatedArticles.length > 0 && (
+          <section>
+            <div className="flex items-center justify-between mb-8">
+              <div className="flex items-center gap-5">
+                <h2 className="text-3xl font-black text-slate-900 uppercase italic tracking-tighter leading-none">
+                  Recommended <span className="text-green-600">Reads</span>
+                </h2>
+                <div className="h-px w-16 bg-slate-200" />
               </div>
-            ))}
+              <button
+                onClick={() => navigate("/articles")}
+                className="text-[9px] font-black text-slate-400 hover:text-green-600 uppercase tracking-widest transition-colors"
+              >
+                All Articles →
+              </button>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {relatedArticles.map((a) => (
+                <ArticleCard key={a.id} data={a} />
+              ))}
+            </div>
+          </section>
+        )}
+
+        {/* ══════════════ ENQUIRY ══════════════ */}
+        <section id="enquiry-form" className="bg-white rounded-[3rem] border border-slate-100 overflow-hidden shadow-xl shadow-slate-200/40 flex flex-col lg:flex-row">
+          {/* Left panel */}
+          <div className="lg:w-5/12 bg-slate-900 p-10 lg:p-14 flex flex-col justify-center relative overflow-hidden">
+            <div className="absolute -right-16 -bottom-16 w-72 h-72 bg-green-500 rounded-full mix-blend-overlay blur-3xl opacity-15 pointer-events-none" />
+            <div className="relative z-10 space-y-6">
+              <span className="inline-block text-[9px] font-black uppercase tracking-[0.3em] text-green-400 border border-green-500/30 bg-green-500/10 px-4 py-2 rounded-xl">
+                Expert Guidance
+              </span>
+              <h2 className="text-4xl font-black text-white uppercase italic tracking-tighter leading-tight">
+                Have Questions?{" "}
+                <span className="text-green-400">Ask Our Experts</span>
+              </h2>
+              <p className="text-slate-400 text-sm leading-relaxed">
+                Whether you need farming advice or want to know which tractor fits your land, the Namaste Tractor team is here to guide you.
+              </p>
+              <div className="space-y-4 pt-2">
+                {["Free Expert Consultation", "Tractor Recommendations", "Finance Guidance"].map((item) => (
+                  <div key={item} className="flex items-center gap-4">
+                    <div className="w-8 h-8 rounded-lg bg-green-500/15 border border-green-500/20 flex items-center justify-center text-green-400 text-xs font-black">✓</div>
+                    <p className="text-[10px] font-black text-white uppercase tracking-widest">{item}</p>
+                  </div>
+                ))}
+              </div>
+            </div>
           </div>
 
-          <div className="mt-16 text-center">
-            <button 
-              onClick={handleLoadMore}
-              className="px-16 py-5 bg-slate-900 text-white font-black rounded-3xl hover:bg-green-600 transition-all uppercase text-xs tracking-[0.3em] shadow-2xl"
-            >
-              Explore Full Library
-            </button>
+          {/* Right panel */}
+          <div className="lg:w-7/12 p-8 lg:p-14 bg-slate-50 flex items-center">
+            <div className="w-full">
+              <EnquiryForm
+                defaultType="article"
+                defaultMessage={`I read the article "${article.title}" and would like to know more.`}
+                hideHeader
+                transparent
+              />
+            </div>
           </div>
         </section>
 
-        {/* ENQUIRY SECTION */}
-        <section className="bg-slate-900 py-24 rounded-[4rem] relative overflow-hidden shadow-2xl">
-          <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
-            <div className="absolute -top-24 -left-24 w-96 h-96 bg-green-500 rounded-full blur-3xl"></div>
-          </div>
-          <div className="max-w-4xl mx-auto px-4 relative z-10">
-            <div className="text-center mb-12">
-              <h2 className="text-4xl font-black text-white italic tracking-tight">Need Expert Suggestions?</h2>
-              <p className="text-slate-400 mt-4 text-lg">Our specialists are standing by to analyze your field requirements.</p>
-            </div>
-            <div className="bg-white rounded-[3.5rem] p-4 shadow-2xl">
-              <div className="bg-slate-50 rounded-[3rem] p-8 md:p-12 border border-gray-100">
-                <EnquiryForm defaultType="Need Suggestion" />
-              </div>
-            </div>
-          </div>
-        </section>
-      </article>
+      </main>
     </div>
   );
 };

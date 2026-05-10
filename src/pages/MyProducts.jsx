@@ -41,6 +41,18 @@ const MyProducts = () => {
     }
   };
 
+  const handleDelete = async (id) => {
+    if (window.confirm("Are you sure you want to delete this product?")) {
+      try {
+        await deleteProduct(id);
+        fetchData();
+        alert("Product deleted successfully!");
+      } catch (err) {
+        alert("Failed to delete product. Please try again.");
+      }
+    }
+  };
+
   return (
     <div className="bg-slate-50 min-h-screen">
       <Navbar />
@@ -73,7 +85,7 @@ const MyProducts = () => {
                         Edit
                       </button>
                       <button 
-                        onClick={() => {/* existing delete logic */}}
+                        onClick={() => handleDelete(p.id)}
                         className="bg-red-50 text-red-500 px-4 py-2 rounded-lg font-bold hover:bg-red-100 transition"
                       >
                         Delete

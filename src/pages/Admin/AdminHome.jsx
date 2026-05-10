@@ -40,13 +40,6 @@ const AdminHome = () => {
       path: "/admin/products",
       color: "from-purple-600 to-purple-700",
     },
-    {
-      title: "YouTube Sync",
-      desc: "Track monetization progress and video performance.",
-      icon: "🎥",
-      path: "#", // Add your YT link or tracker here
-      color: "from-red-600 to-red-700",
-    },
   ];
 
   return (
@@ -103,8 +96,8 @@ const AdminHome = () => {
       {/* Quick Access Footer */}
       <div className="bg-slate-900 rounded-[3rem] p-10 mt-12 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="text-center md:text-left">
-             <p className="text-green-400 font-black text-xs uppercase tracking-widest">Mechanical Summary</p>
-             <h4 className="text-white text-xl font-bold mt-1">Ready to update your 75-acre field log?</h4>
+             <p className="text-green-400 font-black text-xs uppercase tracking-widest">System Overview</p>
+             <h4 className="text-white text-xl font-bold mt-1">Review pending enquiries and manage your active listings.</h4>
           </div>
           <button 
             onClick={() => navigate("/")}
