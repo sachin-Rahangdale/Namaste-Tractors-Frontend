@@ -470,6 +470,10 @@ const Tractors = () => {
               )}
             </main>
           )}
+          
+          <div className="mt-16 pb-8">
+            <EnquiryForm defaultType="tractor" />
+          </div>
         </div>
       </div>
     </>

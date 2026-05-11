@@ -38,7 +38,7 @@ const EnquiryForm = ({ defaultType = "tractor", defaultMessage = "", hideHeader 
   };
 
   return (
-    <section className={transparent ? "" : "bg-white rounded-[2rem] shadow-xl shadow-black/5 p-8 md:p-10 border border-gray-100 max-w-4xl mx-auto my-12"}>
+    <section className={transparent ? "" : "bg-white rounded-[2rem] shadow-xl shadow-black/5 p-8 md:p-10 border border-gray-100 max-w-4xl mx-auto"}>
       {/* Header */}
       {!hideHeader && (
         <div className="text-center mb-8">

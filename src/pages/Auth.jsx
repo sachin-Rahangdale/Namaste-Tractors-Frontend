@@ -81,7 +81,7 @@ const Auth = () => {
             {[
               { icon: '🚜', text: 'Browse 500+ tractor models with specs & pricing' },
               { icon: '📰', text: 'Expert articles, reviews & farming insights' },
-              { icon: '🤝', text: 'Dealer contacts, finance & subsidy guidance' },
+              { icon: '🤝', text: 'Tractor purchase & subsidy guidance' },
               { icon: '⚙️', text: 'Machinery, crops & agricultural marketplace' },
             ].map(f => (
               <div key={f.text} className="flex items-start gap-3">
@@ -98,7 +98,7 @@ const Auth = () => {
           <div className="w-10 h-10 rounded-full bg-green-500 flex items-center justify-center text-white font-black text-sm">N</div>
           <div>
             <p className="text-white font-bold text-sm">Namaste Tractor Team</p>
-            <p className="text-green-300 text-xs">Serving Vidarbha's farmers since 2024</p>
+            <p className="text-green-300 text-xs">A Platform to Help Indian Farmers</p>
           </div>
         </div>
       </div>

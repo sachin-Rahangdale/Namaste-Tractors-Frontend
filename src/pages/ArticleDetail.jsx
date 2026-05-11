@@ -14,12 +14,12 @@ const ArticleDetail = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
 
-  const [article, setArticle]           = useState(null);
-  const [comments, setComments]         = useState([]);
-  const [relatedArticles, setRelated]   = useState([]);
-  const [loading, setLoading]           = useState(true);
-  const [newComment, setNewComment]     = useState({ name: "", content: "" });
-  const [submitting, setSubmitting]     = useState(false);
+  const [article, setArticle] = useState(null);
+  const [comments, setComments] = useState([]);
+  const [relatedArticles, setRelated] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [newComment, setNewComment] = useState({ name: "", content: "" });
+  const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -45,19 +45,24 @@ const ArticleDetail = () => {
   };
 
   const handleCommentSubmit = async (e) => {
-    e.preventDefault();
-    setSubmitting(true);
-    try {
-      await postComment(article.id, newComment);
-      setNewComment({ name: "", content: "" });
-      const commentData = await getArticleComments(article.id, 0, 10);
-      setComments(commentData.content || []);
-    } catch {
-      alert("Failed to post comment. Please try again.");
-    } finally {
-      setSubmitting(false);
-    }
-  };
+  e.preventDefault();
+  if (!newComment.content.trim()) return;
+  
+  setSubmitting(true);
+  try {
+    // Only sending the content as per your backend requirement
+    await postComment(article.id, { content: newComment.content });
+    setNewComment({ content: "" }); // Resetting only content
+    
+    // Refresh comments
+    const commentData = await getArticleComments(article.id, 0, 10);
+    setComments(commentData.content || []);
+  } catch {
+    alert("Failed to post comment. Please check if you are logged in.");
+  } finally {
+    setSubmitting(false);
+  }
+};
 
   /* ── Loading ── */
   if (loading) {
@@ -212,81 +217,155 @@ const ArticleDetail = () => {
         </div>
 
         {/* ══════════════ COMMENTS ══════════════ */}
-        <section>
-          <div className="flex items-center gap-5 mb-8">
-            <h2 className="text-3xl font-black text-slate-900 uppercase italic tracking-tighter leading-none">
-              Discussion
-            </h2>
-            <span className="text-[9px] font-black text-slate-400 uppercase tracking-widest bg-slate-100 px-3 py-1.5 rounded-xl">
-              {comments.length} {comments.length === 1 ? "comment" : "comments"}
-            </span>
-            <div className="h-px flex-1 bg-slate-100" />
+<section className="pt-12 border-t border-slate-200">
+  
+  {/* Header */}
+  <div className="flex items-center justify-between mb-8">
+    <div className="flex items-center gap-3">
+      <h2 className="text-2xl md:text-3xl font-black text-slate-900">
+        Discussion
+      </h2>
+
+      <div className="min-w-8 h-8 px-3 rounded-full bg-green-600 flex items-center justify-center">
+        <span className="text-white text-sm font-bold">
+          {comments.length}
+        </span>
+      </div>
+    </div>
+  </div>
+
+  {/* Comment Form */}
+  <div className="bg-white border border-slate-200 rounded-3xl p-6 md:p-7 shadow-sm mb-10">
+
+    <form onSubmit={handleCommentSubmit}>
+      <textarea
+        placeholder="Share your thoughts about this article..."
+        required
+        rows={4}
+        value={newComment.content}
+        onChange={(e) => setNewComment({ content: e.target.value })}
+        className="
+          w-full
+          bg-slate-50
+          border
+          border-slate-200
+          focus:border-green-600
+          focus:bg-white
+          outline-none
+          text-slate-900
+          text-[15px]
+          leading-7
+          p-5
+          rounded-2xl
+          transition-all
+          resize-none
+          placeholder:text-slate-400
+        "
+      />
+
+      <div className="flex justify-end mt-5">
+        <button
+          type="submit"
+          disabled={submitting || !newComment.content.trim()}
+          className="
+            bg-slate-900
+            hover:bg-green-700
+            disabled:opacity-40
+            text-white
+            px-7
+            py-3.5
+            rounded-2xl
+            font-semibold
+            text-sm
+            transition-all
+          "
+        >
+          {submitting ? "Posting..." : "Post Comment"}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  {/* Comments */}
+  <div className="space-y-5">
+
+    {comments.length > 0 ? (
+      comments.map((c) => (
+        <div
+          key={c.id}
+          className="
+            flex
+            gap-4
+            bg-white
+            border
+            border-slate-200
+            rounded-3xl
+            p-5
+            shadow-sm
+            hover:shadow-md
+            transition-all
+          "
+        >
+
+          {/* Avatar */}
+          <div
+            className="
+              w-11
+              h-11
+              shrink-0
+              rounded-2xl
+              bg-green-50
+              border
+              border-green-100
+              flex
+              items-center
+              justify-center
+              text-green-700
+              font-bold
+              text-sm
+              uppercase
+            "
+          >
+            {c.name?.[0] || "U"}
           </div>
 
-          {/* Comment Form */}
-          <div className="bg-white rounded-[2rem] border border-slate-100 shadow-lg shadow-slate-200/30 p-8 mb-8">
-            <p className="text-[9px] font-black text-slate-400 uppercase tracking-[0.3em] mb-6">
-              Leave a Comment
-            </p>
-            <form onSubmit={handleCommentSubmit} className="space-y-4">
-              <input
-                type="text"
-                placeholder="Your name"
-                required
-                value={newComment.name}
-                onChange={(e) => setNewComment({ ...newComment, name: e.target.value })}
-                className="w-full bg-slate-50 border border-slate-200 focus:border-green-500 outline-none text-slate-900 text-sm font-bold px-5 py-4 rounded-2xl transition-all"
-              />
-              <textarea
-                placeholder="Share your thoughts..."
-                required
-                rows={4}
-                value={newComment.content}
-                onChange={(e) => setNewComment({ ...newComment, content: e.target.value })}
-                className="w-full bg-slate-50 border border-slate-200 focus:border-green-500 outline-none text-slate-900 text-sm font-bold px-5 py-4 rounded-2xl transition-all resize-none"
-              />
-              <button
-                type="submit"
-                disabled={submitting}
-                className="bg-slate-900 hover:bg-green-600 disabled:opacity-50 text-white px-8 py-4 rounded-2xl font-black text-[10px] uppercase tracking-widest transition-all"
-              >
-                {submitting ? "Posting..." : "Post Comment →"}
-              </button>
-            </form>
-          </div>
+          {/* Content */}
+          <div className="flex-1">
 
-          {/* Comment List */}
-          {comments.length > 0 ? (
-            <div className="space-y-4">
-              {comments.map((c) => (
-                <div key={c.id} className="bg-white rounded-[2rem] border border-slate-100 p-6 flex gap-5 shadow-sm">
-                  <div className="w-10 h-10 shrink-0 rounded-xl bg-slate-900 text-white flex items-center justify-center text-xs font-black uppercase">
-                    {c.name?.[0] || "A"}
-                  </div>
-                  <div className="flex-1">
-                    <div className="flex items-center gap-3 mb-2">
-                      <p className="text-xs font-black text-slate-900 uppercase tracking-wider">{c.name}</p>
-                      <span className="text-slate-200">·</span>
-                      <p className="text-[9px] font-black text-slate-400 uppercase tracking-widest">
-                        {new Date(c.createdAt).toLocaleDateString("en-IN", {
-                          day: "numeric", month: "short",
-                        })}
-                      </p>
-                    </div>
-                    <p className="text-slate-600 text-sm leading-relaxed">{c.content}</p>
-                  </div>
-                </div>
-              ))}
-            </div>
-          ) : (
-            <div className="text-center py-12 bg-white rounded-[2rem] border border-slate-100">
-              <p className="text-slate-300 text-4xl mb-3">💬</p>
-              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">
-                No comments yet — be the first!
+            <div className="flex items-center gap-3 mb-2 flex-wrap">
+
+              <p className="text-sm font-bold text-slate-900">
+                {c.name || "Community Member"}
+              </p>
+
+              <span className="text-slate-300">•</span>
+
+              <p className="text-xs text-slate-500 font-medium">
+                {new Date(c.createdAt).toLocaleDateString("en-IN", {
+                  day: "numeric",
+                  month: "short",
+                  year: "numeric",
+                })}
               </p>
             </div>
-          )}
-        </section>
+
+            <p className="text-slate-700 text-[15px] leading-7">
+              {c.content}
+            </p>
+
+          </div>
+        </div>
+      ))
+    ) : (
+      <div className="text-center py-16 bg-slate-50 border border-dashed border-slate-300 rounded-3xl">
+        <p className="text-slate-500 text-sm font-medium">
+          No comments yet. Start the discussion.
+        </p>
+      </div>
+    )}
+
+  </div>
+</section>
 
         {/* ══════════════ RELATED ARTICLES ══════════════ */}
         {relatedArticles.length > 0 && (

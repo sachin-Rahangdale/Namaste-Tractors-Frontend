@@ -7,10 +7,10 @@ const ArticleCard = ({ data, featured }) => {
   return (
     <div
       onClick={() => navigate(`/article/${data.slug}`)}
-      className="bg-white p-3 border border-gray-200 shadow-sm hover:shadow-md hover:border-[#0F3D2E]/30 transition-all duration-300 flex flex-col h-full group rounded-sm cursor-pointer"
+      className="bg-[#F6F9F7] p-3 border border-[#E0EAE4] shadow-sm hover:shadow-lg hover:-translate-y-1 hover:border-[#0F3D2E]/40 transition-all duration-300 flex flex-col h-full group rounded-sm cursor-pointer"
     >
       {/* Image */}
-      <div className="w-full aspect-[16/9] overflow-hidden bg-gray-50 mb-3 rounded-sm relative">
+      <div className="w-full aspect-[16/9] overflow-hidden bg-white mb-3 rounded-sm relative">
         <img
           src={data.mainImageUrl}
           alt={data.title}

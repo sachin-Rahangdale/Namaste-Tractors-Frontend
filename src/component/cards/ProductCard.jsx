@@ -8,12 +8,12 @@ const ProductCard = ({ data, categoryMeta }) => {
   return (
     <div
       onClick={() => navigate(`/product/${data.id}`)}
-      className="bg-white p-3 border border-gray-200 shadow-sm hover:shadow-md transition-all duration-300 flex flex-col h-full group rounded-sm cursor-pointer"
+      className="bg-[#F6F9F7] p-3 border border-[#E0EAE4] shadow-sm hover:shadow-lg hover:-translate-y-1 transition-all duration-300 flex flex-col h-full group rounded-sm cursor-pointer"
       onMouseEnter={(e) => e.currentTarget.style.borderColor = accent}
       onMouseLeave={(e) => e.currentTarget.style.borderColor = '#e5e7eb'}
     >
       {/* Rectangle Image */}
-      <div className="w-full aspect-[16/9] overflow-hidden bg-gray-50 mb-3 rounded-sm">
+      <div className="w-full aspect-[16/9] overflow-hidden bg-white mb-3 rounded-sm">
         <img
           src={data.imageUrl || "https://placehold.co/400x300/f3f4f6/9ca3af?text=No+Image"}
           alt={data.productName}

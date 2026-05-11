@@ -104,7 +104,7 @@ const Home = () => {
       </div>
 
       {/* ── MAIN CONTENT ──────────────────────────────────────────── */}
-      <main className="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 pb-24 pt-10 space-y-20">
+      <main className="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 pb-10 pt-10 space-y-12">
 
         {/* Tractors Section */}
         <section className="fade-up">
@@ -163,12 +163,12 @@ const Home = () => {
         {/* Trust Bar (Shifted below Products) */}
         <section className="rounded-3xl p-8 text-center"
           style={{ background: 'linear-gradient(135deg, #0F3D2E, #1a5c40)' }}>
-          <p className="text-green-300 text-xs font-black uppercase tracking-widest mb-4">Trusted by Farmers Across Vidarbha</p>
+          <p className="text-green-300 text-xs font-black uppercase tracking-widest mb-4">Trusted by Farmers Across India</p>
           <div className="flex flex-wrap justify-center gap-8 md:gap-16">
             {[
-              { icon: '✅', label: 'Verified Dealers' },
+              { icon: '✅', label: 'Farming Advice' },
               { icon: '📞', label: 'Expert Support' },
-              { icon: '💳', label: 'Finance Guidance' },
+              { icon: '💳', label: 'Sell Froducts' },
               { icon: '🏛️', label: 'Subsidy Info' },
             ].map(item => (
               <div key={item.label} className="flex items-center gap-2 text-white">
