@@ -191,6 +191,13 @@ const TractorDetail = () => {
     {
       id: "engine",
       label: "Engine",
+      theme: {
+        bg: "bg-green-50/30",
+        border: "border-green-100",
+        iconBg: "bg-green-600",
+        accent: "text-green-700",
+        headerBg: "bg-green-50/80"
+      },
       icon: (
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" />
@@ -208,6 +215,13 @@ const TractorDetail = () => {
     {
       id: "transmission",
       label: "Transmission",
+      theme: {
+        bg: "bg-blue-50/30",
+        border: "border-blue-100",
+        iconBg: "bg-blue-600",
+        accent: "text-blue-700",
+        headerBg: "bg-blue-50/80"
+      },
       icon: (
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
@@ -225,6 +239,13 @@ const TractorDetail = () => {
     {
       id: "chassis",
       label: "Chassis",
+      theme: {
+        bg: "bg-orange-50/30",
+        border: "border-orange-100",
+        iconBg: "bg-orange-600",
+        accent: "text-orange-700",
+        headerBg: "bg-orange-50/80"
+      },
       icon: (
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
@@ -241,6 +262,13 @@ const TractorDetail = () => {
     {
       id: "tyres",
       label: "Tyres & Dims",
+      theme: {
+        bg: "bg-slate-50/50",
+        border: "border-slate-200",
+        iconBg: "bg-slate-600",
+        accent: "text-slate-700",
+        headerBg: "bg-slate-100/80"
+      },
       icon: (
         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <circle cx="12" cy="12" r="9" strokeWidth={2} stroke="currentColor" fill="none" />
@@ -273,7 +301,7 @@ const TractorDetail = () => {
       <main className="max-w-7xl mx-auto px-4 lg:px-10 pb-20 space-y-10">
 
         {/* ══ HERO ══════════════════════════════════════════════════════════════ */}
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
+        <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
 
             {/* LEFT — Image Slider */}
@@ -302,6 +330,7 @@ const TractorDetail = () => {
                   </span>
                   <span className="text-xs text-gray-500 font-bold uppercase tracking-widest">Ex-Showroom Price</span>
                 </div>
+                
 
                 {/* Quick spec grid */}
                 <div className="grid grid-cols-2 gap-3 mb-6">
@@ -345,18 +374,18 @@ const TractorDetail = () => {
               if (visibleRows.length === 0) return null;
 
               return (
-                <div key={tab.id} className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-                  <div className="flex items-center gap-3 px-6 py-5 bg-gray-50/80 border-b border-gray-100">
-                    <div className="text-green-700 bg-white shadow-sm border border-gray-100 p-2.5 rounded-xl">
+                <div key={tab.id} className={`${tab.theme.bg} rounded-2xl border ${tab.theme.border} shadow-sm overflow-hidden`}>
+                  <div className={`flex items-center gap-3 px-6 py-5 ${tab.theme.headerBg} border-b ${tab.theme.border}`}>
+                    <div className={`${tab.theme.iconBg} text-white shadow-sm p-2.5 rounded-xl`}>
                       {tab.icon}
                     </div>
-                    <h3 className="text-lg font-black text-gray-900 uppercase tracking-widest italic">{tab.label}</h3>
+                    <h3 className={`text-lg font-black ${tab.theme.accent} uppercase tracking-widest italic`}>{tab.label}</h3>
                   </div>
 
                   <div className="p-6 lg:p-8">
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-0">
                       {visibleRows.map((row, i) => (
-                        <div key={i} className="flex justify-between items-center py-4 border-b border-gray-50 last:border-0 hover:bg-gray-50/50 rounded-lg px-2 -mx-2 transition-colors">
+                        <div key={i} className="flex justify-between items-center py-4 border-b border-black/5 last:border-0 rounded-lg px-2 -mx-2 transition-colors">
                           <span className="text-sm font-bold text-gray-800 flex-shrink-0 pr-4">{row.label}</span>
                           <span className="text-sm font-bold text-gray-900 text-right">{row.value}</span>
                         </div>
@@ -475,7 +504,7 @@ const QuickSpec = ({ label, value, icon }) => (
 const SectionHeading = ({ title, subtitle, action, onAction }) => (
   <div className="flex items-start justify-between mb-6">
     <div>
-      <h2 className="text-2xl font-black text-gray-900 uppercase italic tracking-tighter">{title}</h2>
+      <h2 className="text-2xl font-black text-gray-900 tracking-tight">{title}</h2>
       {subtitle && <p className="text-sm font-medium text-gray-500 mt-1">{subtitle}</p>}
     </div>
     {action && (

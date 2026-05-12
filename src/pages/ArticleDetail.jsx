@@ -17,6 +17,7 @@ const ArticleDetail = () => {
   const [article, setArticle] = useState(null);
   const [comments, setComments] = useState([]);
   const [relatedArticles, setRelated] = useState([]);
+  const [sameTypeArticles, setSameTypeArticles] = useState([]);
   const [loading, setLoading] = useState(true);
   const [newComment, setNewComment] = useState({ name: "", content: "" });
   const [submitting, setSubmitting] = useState(false);
@@ -36,6 +37,15 @@ const ArticleDetail = () => {
       setComments(commentData.content || []);
 
       const related = await getArticles(0, 4);
+      const sameType = (related.content || [])
+       .filter(
+          (a) =>
+           a.id !== data.id &&
+          a.articleType === data.articleType
+          )
+       .slice(0, 4);
+
+setSameTypeArticles(sameType);
       setRelated((related.content || []).filter((a) => a.id !== data.id).slice(0, 3));
     } catch (err) {
       console.error("Error loading article:", err);
@@ -43,6 +53,7 @@ const ArticleDetail = () => {
       setLoading(false);
     }
   };
+
 
   const handleCommentSubmit = async (e) => {
   e.preventDefault();
@@ -366,6 +377,33 @@ const ArticleDetail = () => {
 
   </div>
 </section>
+
+
+{/* ══════════════ SAME TYPE ARTICLES ══════════════ */}
+{sameTypeArticles.length > 0 && (
+  <section>
+    <div className="flex items-center justify-between mb-8">
+
+      <div className="flex items-center gap-5">
+        <h2 className="text-3xl font-black text-slate-900">
+          More In{" "}
+          <span className="text-green-600">
+            {article.articleType?.replaceAll("_", " ")}
+          </span>
+        </h2>
+
+        <div className="h-px w-16 bg-slate-200" />
+      </div>
+
+    </div>
+
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      {sameTypeArticles.map((a) => (
+        <ArticleCard key={a.id} data={a} />
+      ))}
+    </div>
+  </section>
+)}
 
         {/* ══════════════ RELATED ARTICLES ══════════════ */}
         {relatedArticles.length > 0 && (

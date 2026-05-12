@@ -6,13 +6,37 @@ import { getArticles } from "../services/articleService";
 
 // ── Category chips ────────────────────────────────────────────────────────────
 const CATEGORIES = [
-  "All",
-  "Tractor Reviews",
-  "Maintenance Tips",
-  "New Launches",
-  "Government Schemes",
-  "Farming Advice",
-  "Comparisons",
+  { label: "All", value: "All" },
+
+  {
+    label: "Tractor Reviews",
+    value: "TRACTOR_REVIEWS",
+  },
+
+  {
+    label: "Maintenance Tips",
+    value: "MAINTENANCE_TIPS",
+  },
+
+  {
+    label: "New Launches",
+    value: "NEW_LAUNCHES",
+  },
+
+  {
+    label: "Government Schemes",
+    value: "GOVERNMENT_SCHEMES",
+  },
+
+  {
+    label: "Farming Advice",
+    value: "FARMING_ADVICE",
+  },
+
+  {
+    label: "Comparisons",
+    value: "COMPARISONS",
+  },
 ];
 
 // ── Skeleton card ─────────────────────────────────────────────────────────────
@@ -90,8 +114,10 @@ const Articles = () => {
     const matchesSearch =
       !searchQuery ||
       a.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      a.summary?.toLowerCase().includes(searchQuery.toLowerCase());
-    const matchesCategory = activeCategory === "All" || a.category === activeCategory;
+      a.shortDescription?.toLowerCase().includes(searchQuery.toLowerCase());
+    const matchesCategory =
+      activeCategory === "All" ||
+      a.articleType === activeCategory; 
     return matchesSearch && matchesCategory;
   });
 
@@ -145,16 +171,16 @@ const Articles = () => {
           <div className="flex items-center gap-2 py-3 overflow-x-auto no-scrollbar mask-edges">
             {CATEGORIES.map(cat => (
               <button
-                key={cat}
-                onClick={() => setActiveCategory(cat)}
+                key={cat.value}
+                onClick={() => setActiveCategory(cat.value)}
                 className="flex-shrink-0 px-4 py-2 rounded-xl text-xs font-bold transition-all duration-200 whitespace-nowrap border"
                 style={
-                  activeCategory === cat
+                  activeCategory === cat.value
                     ? { background: "#0F3D2E", color: "#fff", borderColor: "#0F3D2E" }
                     : { background: "#F9FAFB", color: "#4B5563", borderColor: "#F3F4F6" }
                 }
               >
-                {cat}
+                {cat.label}
               </button>
             ))}
           </div>

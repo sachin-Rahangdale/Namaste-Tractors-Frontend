@@ -18,8 +18,10 @@ const Navbar = () => {
   // Close mobile menu on route change
   useEffect(() => { setMenuOpen(false); }, [location.pathname]);
 
-  const activeStyle   = "text-[#0F3D2E] font-bold border-b-2 border-[#0F3D2E] pb-1";
-  const normalStyle   = "text-gray-600 hover:text-[#0F3D2E] transition-colors font-medium";
+  const activeStyle =
+  "text-[#0F3D2E] font-bold text-[15px] border-b-2 border-[#0F3D2E] pb-1";
+  const normalStyle =
+  "text-gray-800 hover:text-[#0F3D2E] transition-colors font-semibold text-[15px]";
   const mobileActive  = "block px-4 py-3 text-[#0F3D2E] font-bold bg-green-50 rounded-xl";
   const mobileNormal  = "block px-4 py-3 text-gray-700 font-medium hover:bg-gray-50 rounded-xl transition-colors";
 
@@ -33,7 +35,7 @@ const Navbar = () => {
         }`}
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between h-[68px] items-center">
+          <div className="flex justify-between h-[72px] items-center">
 
             {/* ── LOGO ────────────────────────────────────────── */}
             <Link to="/" className="flex items-center gap-2.5 group shrink-0">
@@ -44,7 +46,7 @@ const Navbar = () => {
             </Link>
 
             {/* ── DESKTOP NAV ──────────────────────────────────── */}
-            <div className="hidden md:flex items-center gap-8">
+            <div className="hidden md:flex items-center gap-10">
               <NavLink to="/"        end className={({ isActive }) => isActive ? activeStyle : normalStyle}>Home</NavLink>
               <NavLink to="/tractors"    className={({ isActive }) => isActive ? activeStyle : normalStyle}>Tractors</NavLink>
               <NavLink to="/articles"    className={({ isActive }) => isActive ? activeStyle : normalStyle}>Articles</NavLink>
@@ -72,7 +74,7 @@ const Navbar = () => {
                     </div>
                     <button
                       onClick={() => { logoutState(); navigate('/'); }}
-                      className="bg-gray-900 text-white px-5 py-2.5 rounded-xl text-sm font-bold hover:bg-gray-700 transition-all shadow-sm"
+                      className=" bg-[#0F3D2E] hover:bg-[#14543f] text-white px-6  py-3  rounded-xl  text-sm font-semibold  transition-all shadow-sm"
                     >
                       Logout
                     </button>
@@ -80,7 +82,10 @@ const Navbar = () => {
                 ) : (
                   <button
                     onClick={() => navigate('/login')}
-                    className="btn-primary text-sm px-6 py-2.5"
+                    className="
+                      bg-[#0F3D2E]
+                         hover:bg-[#14543f]
+                         text-white text-sm font-semibold px-6 py-3 rounded-xl transition-all shadow-sm"
                   >
                     Sign In
                   </button>

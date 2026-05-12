@@ -20,11 +20,27 @@ const ArticleCard = ({ data, featured }) => {
 
       {/* Content */}
       <div className="flex flex-col flex-grow px-1">
-        {data.category && (
-          <span className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-1.5 block">
-            {data.category}
-          </span>
-        )}
+        
+        {data.articleType && (
+  <div className="mb-2">
+    <span
+      className="
+        inline-flex
+        items-center
+        px-3
+        py-1
+        rounded-full
+        bg-green-50
+        text-green-700
+        text-[11px]
+        font-bold
+        tracking-wide
+      "
+    >
+      {data.articleType.replaceAll("_", " ")}
+    </span>
+  </div>
+)}
         
         <h3 className={`font-bold text-gray-900 leading-snug mb-2 group-hover:text-[#0F3D2E] transition-colors line-clamp-2 ${featured ? 'text-lg' : 'text-sm'}`}>
           {data.title}
