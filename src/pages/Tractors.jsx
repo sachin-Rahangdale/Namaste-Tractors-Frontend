@@ -15,21 +15,21 @@ const FontLink = () => (
 
 // ── Brand chips (add more as your backend grows) ──────────────────────────────
 const BRANDS = [
-  { id: null,  label: "All Brands" },
-  { id: 1,     label: "John Deere" },
-  { id: 2,     label: "Mahindra" },
-  { id: 3,     label: "TAFE" },
-  { id: 4,     label: "Sonalika" },
-  { id: 5,     label: "New Holland" },
-  { id: 6,     label: "Eicher" },
+  { id: null, label: "All Brands" },
+  { id: 1, label: "John Deere" },
+  { id: 2, label: "Mahindra" },
+  { id: 3, label: "TAFE" },
+  { id: 4, label: "Sonalika" },
+  { id: 5, label: "New Holland" },
+  { id: 6, label: "Eicher" },
 ];
 
 const SORT_OPTIONS = [
-  { value: "",           label: "Relevance" },
-  { value: "price_asc",  label: "Price: Low → High" },
+  { value: "", label: "Relevance" },
+  { value: "price_asc", label: "Price: Low → High" },
   { value: "price_desc", label: "Price: High → Low" },
-  { value: "hp_asc",     label: "HP: Low → High" },
-  { value: "hp_desc",    label: "HP: High → Low" },
+  { value: "hp_asc", label: "HP: Low → High" },
+  { value: "hp_desc", label: "HP: High → Low" },
 ];
 
 // ── Skeleton card ─────────────────────────────────────────────────────────────
@@ -53,25 +53,25 @@ const sortTractors = (list, sortKey) => {
   if (!sortKey || !list?.length) return list;
   const sorted = [...list];
   switch (sortKey) {
-    case "price_asc":  return sorted.sort((a, b) => a.price - b.price);
+    case "price_asc": return sorted.sort((a, b) => a.price - b.price);
     case "price_desc": return sorted.sort((a, b) => b.price - a.price);
-    case "hp_asc":     return sorted.sort((a, b) => a.hp - b.hp);
-    case "hp_desc":    return sorted.sort((a, b) => b.hp - a.hp);
-    default:           return sorted;
+    case "hp_asc": return sorted.sort((a, b) => a.hp - b.hp);
+    case "hp_desc": return sorted.sort((a, b) => b.hp - a.hp);
+    default: return sorted;
   }
 };
 
 // ── Main Component ────────────────────────────────────────────────────────────
 const Tractors = () => {
-  const [tractors,     setTractors]     = useState([]);
-  const [loading,      setLoading]      = useState(true);
-  const [error,        setError]        = useState(null);
+  const [tractors, setTractors] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
   const [totalElements, setTotalElements] = useState(0);
-  const [totalPages,   setTotalPages]   = useState(0);
-  const [filtersOpen,  setFiltersOpen]  = useState(false);
+  const [totalPages, setTotalPages] = useState(0);
+  const [filtersOpen, setFiltersOpen] = useState(false);
 
-  const [activeBrand,  setActiveBrand]  = useState(null);  // brandId or null
-  const [sortKey,      setSortKey]      = useState("");
+  const [activeBrand, setActiveBrand] = useState(null);  // brandId or null
+  const [sortKey, setSortKey] = useState("");
 
   const [filters, setFilters] = useState({
     minHp: "", maxHp: "",
@@ -159,40 +159,40 @@ const Tractors = () => {
         <Navbar />
 
         {/* ── HERO ──────────────────────────────────────────────────────────── */}
-<div className="bg-green-50 border-b border-green-100">
-  <div className="max-w-[1440px] mx-auto px-6 py-10">
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
+        <div className="bg-green-50 border-b border-green-100">
+          <div className="max-w-[1440px] mx-auto px-6 py-10">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
 
-      {/* Text */}
-      <div>
-        <span className="text-xs font-semibold text-green-700 uppercase tracking-widest">
-          🚜 Namaste Tractor
-        </span>
-        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mt-1 leading-snug">
-          Find Your <span className="text-green-700">Perfect Tractor</span>
-        </h1>
-        <p className="text-gray-500 mt-2 text-sm max-w-md">
-          India's trusted marketplace — on-road pricing, subsidy guidance & expert support.
-        </p>
-      </div>
+              {/* Text */}
+              <div>
+                <span className="text-xs font-semibold text-green-700 uppercase tracking-widest">
+                  🚜 Namaste Tractor
+                </span>
+                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mt-1 leading-snug">
+                  Find Your <span className="text-green-700">Perfect Tractor</span>
+                </h1>
+                <p className="text-gray-500 mt-2 text-sm max-w-md">
+                  India's trusted marketplace — on-road pricing, subsidy guidance & expert support.
+                </p>
+              </div>
 
-      {/* Stats */}
-      <div className="flex gap-3 flex-shrink-0">
-        {[
-          { label: "Models",      value: totalElements || "500+" },
-          { label: "HP Range",    value: "15–120 HP" },
-          { label: "Price Range", value: "₹3L – ₹50L+" },
-        ].map(s => (
-          <div key={s.label} className="bg-white border border-green-100 rounded-2xl px-4 py-3 text-center shadow-sm">
-            <p className="text-base font-bold text-gray-900">{s.value}</p>
-            <p className="text-xs text-gray-400 mt-0.5">{s.label}</p>
+              {/* Stats */}
+              <div className="flex gap-3 flex-shrink-0">
+                {[
+                  { label: "Models", value: totalElements || "500+" },
+                  { label: "HP Range", value: "15–120 HP" },
+                  { label: "Price Range", value: "₹3L – ₹50L+" },
+                ].map(s => (
+                  <div key={s.label} className="bg-white border border-green-100 rounded-2xl px-4 py-3 text-center shadow-sm">
+                    <p className="text-base font-bold text-gray-900">{s.value}</p>
+                    <p className="text-xs text-gray-400 mt-0.5">{s.label}</p>
+                  </div>
+                ))}
+              </div>
+
+            </div>
           </div>
-        ))}
-      </div>
-
-    </div>
-  </div>
-</div>
+        </div>
 
         {/* ── BRAND CHIPS ───────────────────────────────────────────────────── */}
         <div className="bg-white border-b border-gray-100 sticky top-0 z-40 shadow-sm">
@@ -470,7 +470,7 @@ const Tractors = () => {
               )}
             </main>
           )}
-          
+
           <div className="mt-16 pb-8">
             <EnquiryForm defaultType="tractor" />
           </div>

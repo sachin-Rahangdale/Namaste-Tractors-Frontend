@@ -94,6 +94,12 @@ const SPEC_FIELDS = [
   },
 
   {
+    key: "liftCapacity",
+    label: "Lift Capacity",
+    type: "number",
+  },
+
+  {
     key: "serviceInterval",
     label: "Service Interval",
     type: "number",

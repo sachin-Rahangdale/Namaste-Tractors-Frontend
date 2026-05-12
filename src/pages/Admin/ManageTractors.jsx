@@ -30,6 +30,7 @@ const EMPTY_SPEC = {
   rearAxle: "",
   frontAxle: "",
   reduction: "",
+  liftCapacity: "",
   serviceInterval: "",
 };
 
@@ -184,6 +185,13 @@ export default function ManageTractors() {
         reduction:
           form.specification
             .reduction,
+
+        liftCapacity:
+          Number(
+            form
+              .specification
+              .liftCapacity
+          ),
 
         serviceInterval:
           Number(

@@ -235,7 +235,7 @@ const TractorDetail = () => {
         { label: "Braking System", value: spec.brakes },
         { label: "Front Axle", value: spec.frontAxle },
         { label: "Rear Axle", value: spec.rearAxle },
-        { label: "Lifting Capacity", value: spec.liftingCapacity ? `${spec.liftingCapacity} kg` : null },
+        { label: "Lifting Capacity", value: spec.liftCapacity ? `${spec.liftCapacity} kg` : null },
       ],
     },
     {

@@ -89,6 +89,10 @@ export default function ManageArticles() {
           "content",
           form.content
         );
+        formData.append(
+          "articleType",
+          form.articleType
+        );
 
         formData.append(
           "mainImage",

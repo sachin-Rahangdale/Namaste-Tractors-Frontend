@@ -10,6 +10,9 @@ export default function ArticleForm({
   const [content, setContent] =
     useState("");
 
+  const [articleType, setArticleType] =
+    useState("TRACTOR_REVIEWS");
+
   const [mainImage, setMainImage] =
     useState(null);
 
@@ -61,6 +64,7 @@ export default function ArticleForm({
         {
           title,
           content,
+          articleType,
           mainImage,
         },
         galleryImages
@@ -130,6 +134,58 @@ export default function ArticleForm({
               className="w-full bg-[#111827] border border-slate-800 focus:border-yellow-500 outline-none text-white px-5 py-4 rounded-2xl text-lg resize-none"
             />
           </div>
+
+          {/* ARTICLE TYPE */}
+<div>
+  <label className="block text-white font-semibold mb-3">
+    Article Type
+  </label>
+
+  <select
+    value={articleType}
+    onChange={(e) =>
+      setArticleType(e.target.value)
+    }
+    className="
+      w-full
+      bg-[#111827]
+      border
+      border-slate-800
+      focus:border-yellow-500
+      outline-none
+      text-white
+      px-5
+      py-4
+      rounded-2xl
+      text-lg
+      cursor-pointer
+    "
+  >
+    <option value="TRACTOR_REVIEWS">
+      Tractor Reviews
+    </option>
+
+    <option value="MAINTENANCE_TIPS">
+      Maintenance Tips
+    </option>
+
+    <option value="NEW_LAUNCHES">
+      New Launches
+    </option>
+
+    <option value="GOVERNMENT_SCHEMES">
+      Government Schemes
+    </option>
+
+    <option value="FARMING_ADVICE">
+      Farming Advice
+    </option>
+
+    <option value="COMPARISONS">
+      Comparisons
+    </option>
+  </select>
+</div>
 
           {/* MAIN IMAGE */}
           <div>
