@@ -21,6 +21,28 @@ const AddProduct = () => {
     category: "MACHINERY"
   });
 
+  const compressImage = async (file) => {
+  try {
+    const options = {
+      maxSizeMB: 0.8,
+      maxWidthOrHeight: 1920,
+      useWebWorker: true,
+    };
+
+    return await imageCompression(
+      file,
+      options
+    );
+  } catch (err) {
+    console.error(
+      "Compression error:",
+      err
+    );
+
+    return file;
+  }
+};
+
   
 
   // Handle Text Inputs
@@ -60,7 +82,18 @@ const AddProduct = () => {
       // 3. Step 2: Upload Images if selected
       if (selectedFiles.length > 0) {
         const imageFormData = new FormData();
-        selectedFiles.forEach((file) => imageFormData.append("images", file));
+        for (const file of selectedFiles) {
+
+  const compressed =
+    file.size > 300 * 1024
+      ? await compressImage(file)
+      : file;
+
+  imageFormData.append(
+    "images",
+    compressed
+  );
+}
         await uploadProductImages(product.id, imageFormData);
       }
 

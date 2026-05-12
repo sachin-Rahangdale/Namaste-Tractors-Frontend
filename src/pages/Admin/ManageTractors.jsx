@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from "react";
-
+import imageCompression from "browser-image-compression";
 import {
   getTractors,
   createTractor,
@@ -48,6 +48,27 @@ const getBrands = async () => {
     return res.data?.content ?? res.data ?? [];
   } catch {
     return [];
+  }
+};
+const compressImage = async (file) => {
+  try {
+    const options = {
+      maxSizeMB: 0.8,
+      maxWidthOrHeight: 1920,
+      useWebWorker: true,
+    };
+
+    return await imageCompression(
+      file,
+      options
+    );
+  } catch (err) {
+    console.error(
+      "Compression error:",
+      err
+    );
+
+    return file;
   }
 };
 
@@ -213,11 +234,19 @@ export default function ManageTractors() {
 
       if (img.file) {
 
-        await uploadTractorImage(
-          tractor.id,
-          img.file,
-          img.type
-        );
+        const compressed =
+  img.file.size >
+  300 * 1024
+    ? await compressImage(
+        img.file
+      )
+    : img.file;
+
+await uploadTractorImage(
+  tractor.id,
+  compressed,
+  img.type
+);
       }
     }
 
@@ -251,11 +280,19 @@ export default function ManageTractors() {
 
       for (const img of images) {
         if (img.file) {
-          await uploadTractorImage(
-            editTarget.id,
-            img.file,
-            img.type
-          );
+          const compressed =
+  img.file.size >
+  300 * 1024
+    ? await compressImage(
+        img.file
+      )
+    : img.file;
+
+await uploadTractorImage(
+  editTarget.id,
+  compressed,
+  img.type
+);
         }
       }
 

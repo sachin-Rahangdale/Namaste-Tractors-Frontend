@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
+import imageCompression from "browser-image-compression";
 
 import {
   getArticles,
@@ -69,6 +70,28 @@ export default function ManageArticles() {
       )
     : articles;
 
+    const compressImage = async (file) => {
+  try {
+    const options = {
+      maxSizeMB: 0.8,
+      maxWidthOrHeight: 1920,
+      useWebWorker: true,
+    };
+
+    return await imageCompression(
+      file,
+      options
+    );
+  } catch (err) {
+    console.error(
+      "Compression error:",
+      err
+    );
+
+    return file;
+  }
+};
+
   // ================= CREATE =================
   const handleCreate =
     async (
@@ -94,10 +117,15 @@ export default function ManageArticles() {
           form.articleType
         );
 
-        formData.append(
-          "mainImage",
-          form.mainImage
-        );
+        const compressedMainImage =
+  await compressImage(
+    form.mainImage
+  );
+
+formData.append(
+  "mainImage",
+  compressedMainImage
+);
 
         const createRes =
           await api.post(
@@ -123,14 +151,16 @@ export default function ManageArticles() {
           const galleryForm =
             new FormData();
 
-          galleryImages.forEach(
-            (img) => {
-              galleryForm.append(
-                "images",
-                img
-              );
-            }
-          );
+          for (const img of galleryImages) {
+
+  const compressed =
+    await compressImage(img);
+
+  galleryForm.append(
+    "images",
+    compressed
+  );
+}
 
           await api.post(
             `/articles/${articleId}/images`,
