@@ -2,7 +2,7 @@ import React, { useState, useEffect, useCallback, useRef } from "react";
 import Navbar from "../component/layout/Navbar";
 import Card from "../component/cards/Card";
 import EnquiryForm from "../component/common/EnquiryForm";
-import { getTractors, getFilteredTractors } from "../services/tractorservice";
+import { getTractors, getFilteredTractors } from "../services/tractorService";
 
 // ── Google Fonts (Syne + Outfit) ──────────────────────────────────────────────
 const FontLink = () => (

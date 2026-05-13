@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import Navbar from "../component/layout/Navbar";
 import Card from "../component/cards/Card";
 import EnquiryForm from "../component/common/EnquiryForm";
-import { getTractorById, getTractorsByBrand, getTractors } from "../services/tractorservice";
+import { getTractorById, getTractorsByBrand, getTractors } from "../services/tractorService";
 
 /* ─── Image Slider ──────────────────────────────────────────────────────────── */
 const ImageSlider = ({ images }) => {
