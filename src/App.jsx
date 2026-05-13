@@ -14,7 +14,7 @@ import Footer from "./component/layout/Footer";
 
 // Admin Imports
 import AdminLayout from "./routes/AdminLayout";
-import AdminHome from "./pages/admin/AdminHome";
+import AdminHome from "./pages/Admin/AdminHome";
 import ProductDetail from "./pages/ProductDetail";
 import ManageEnquiries from "./pages/Admin/ManageEnquiries";
 import ManageBrands from "./pages/Admin/ManageBrands";
