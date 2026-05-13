@@ -21,7 +21,7 @@ import ManageTractors from "./pages/admin/ManageTractors";
 import TractorForm from "./component/admin/TractorForm";
 import ManageArticles from "./pages/admin/ManageArticles";
 import ManageProducts from "./pages/admin/ManageProduct";
-import AdminHome from "./pages/admin/AdminHome";
+
 
 
 function App() {
