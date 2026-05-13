@@ -36,7 +36,7 @@ function App() {
       <div className="flex-grow">
         <Routes>
           {/* PUBLIC & USER ROUTES */}
-          <Route path="/" element={<AdminHome/>} />
+          <Route path="/" element={<Home/>} />
           <Route path="/login" element={user ? <Navigate to="/" /> : <Auth />} />
           <Route path="/tractors" element={<Tractors />} />
           <Route path="/tractor/:id" element={<TractorDetail />} />
@@ -60,7 +60,7 @@ function App() {
             path="/admin" 
             element={isAdmin ? <AdminLayout /> : <Navigate to="/login" />}
           >
-            <Route index element={<Home />} />
+            <Route index element={<AdminHome />} />
             <Route path="tractors" element={<ManageTractors/>} />
             <Route path="tractors/new" element={<TractorForm />} />
     <Route path="tractors/edit/:id" element={<TractorForm />} />
