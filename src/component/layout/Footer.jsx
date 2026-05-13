@@ -23,16 +23,7 @@ export default function Footer() {
                 Empowering India's farmers with modern technology, expert guidance, and the best tractor deals.
               </p>
             </div>
-            <a
-              href="/enquiry/new"
-              className="inline-flex items-center w-fit gap-2 px-5 py-2.5 rounded-xl font-bold text-sm transition-all hover:scale-105"
-              style={{ background: 'rgba(251,191,36,0.15)', color: '#FBBF24', border: '1px solid rgba(251,191,36,0.25)' }}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" d="M8 10a4 4 0 118 0c0 2-2 3-2 3m-2 4h.01M12 2a10 10 0 100 20 10 10 0 000-20z"/>
-              </svg>
-              Need Help?
-            </a>
+            
           </div>
 
           {/* Contact */}

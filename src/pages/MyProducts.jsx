@@ -72,7 +72,7 @@ const MyProducts = () => {
               {myProducts.map(p => (
                 <tr key={p.id} className="hover:bg-gray-50 transition">
                   <td className="p-5 flex items-center gap-4">
-                    <img src={p.imageUrl} className="w-12 h-12 rounded-xl object-cover border" alt={p.productName} />
+                    <img loading="lazy"      src={p.imageUrl} className="w-12 h-12 rounded-xl object-cover border" alt={p.productName} />
                     <span className="font-semibold text-gray-800">{p.productName}</span>
                   </td>
                   <td className="p-5 text-green-600 font-bold text-lg">₹{p.price.toLocaleString()}</td>

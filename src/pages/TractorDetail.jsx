@@ -41,6 +41,7 @@ const ImageSlider = ({ images }) => {
       {/* Main slider */}
       <div className="relative w-full aspect-[4/3] bg-gray-50 rounded-2xl overflow-hidden group">
         <img
+          loading="lazy"
           key={current}
           src={allImages[current]}
           alt={`Slide ${current + 1}`}
@@ -102,11 +103,11 @@ const ImageSlider = ({ images }) => {
               key={i}
               onClick={() => setCurrent(i)}
               className={`flex-shrink-0 w-20 h-14 rounded-xl overflow-hidden border-2 transition-all duration-200 ${i === current
-                  ? "border-green-600 shadow-md shadow-green-200"
-                  : "border-transparent opacity-60 hover:opacity-100 hover:border-gray-200"
+                ? "border-green-600 shadow-md shadow-green-200"
+                : "border-transparent opacity-60 hover:opacity-100 hover:border-gray-200"
                 }`}
             >
-              <img src={src} alt="" className="w-full h-full object-cover" />
+              <img loading="lazy" src={src} alt="" className="w-full h-full object-cover" />
             </button>
           ))}
         </div>
@@ -133,20 +134,37 @@ const TractorDetail = () => {
 
   const loadAllData = async () => {
     setLoading(true);
+
     try {
+
+      // First fetch tractor
       const tractorRes = await getTractorById(id);
+
       setTractor(tractorRes);
 
       const bId = tractorRes.brandId || tractorRes.brand?.id;
-      if (bId) {
-        const brandRes = await getTractorsByBrand(bId, 0, 4);
-        setBrandRelated((brandRes.content || []).filter((t) => t.id !== parseInt(id)));
-      }
 
-      const generalRes = await getTractors(0, 4);
-      setGeneralRelated((generalRes.content || []).filter((t) => t.id !== parseInt(id)));
+      // Run remaining APIs in parallel
+      const [brandRes, generalRes] = await Promise.all([
+        bId
+          ? getTractorsByBrand(bId, 0, 4)
+          : Promise.resolve({ content: [] }),
+
+        getTractors(0, 4)
+      ]);
+
+      setBrandRelated(
+        (brandRes.content || [])
+          .filter(t => t.id !== parseInt(id))
+      );
+
+      setGeneralRelated(
+        (generalRes.content || [])
+          .filter(t => t.id !== parseInt(id))
+      );
+
     } catch (err) {
-      console.error("Failed to load tractor details:", err);
+      console.error(err);
     } finally {
       setLoading(false);
     }
@@ -330,7 +348,7 @@ const TractorDetail = () => {
                   </span>
                   <span className="text-xs text-gray-500 font-bold uppercase tracking-widest">Ex-Showroom Price</span>
                 </div>
-                
+
 
                 {/* Quick spec grid */}
                 <div className="grid grid-cols-2 gap-3 mb-6">
@@ -410,7 +428,10 @@ const TractorDetail = () => {
             <SectionHeading
               title={`More from ${tractor.brand}`}
               action="View All →"
-              onAction={() => navigate("/tractors")}
+              onAction={() => {
+  navigate("/tractors");
+  window.scrollTo(0, 0);
+}}
             />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {brandRelated.map(item => <Card key={item.id} data={item} />)}
@@ -424,7 +445,10 @@ const TractorDetail = () => {
             <SectionHeading
               title="Popular Alternatives"
               action="Browse All →"
-              onAction={() => navigate("/tractors")}
+              onAction={() => {
+  navigate("/tractors");
+  window.scrollTo(0, 0);
+}}
             />
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
               {generalRelated.map(item => <Card key={item.id} data={item} />)}

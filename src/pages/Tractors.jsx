@@ -16,12 +16,15 @@ const FontLink = () => (
 // ── Brand chips (add more as your backend grows) ──────────────────────────────
 const BRANDS = [
   { id: null, label: "All Brands" },
-  { id: 1, label: "John Deere" },
-  { id: 2, label: "Mahindra" },
-  { id: 3, label: "TAFE" },
-  { id: 4, label: "Sonalika" },
-  { id: 5, label: "New Holland" },
+  { id: 1, label: "Mahindra" },
+  { id: 2, label: "Swaraj" },
+  { id: 3, label: "Sonalika" },
+  { id: 4, label: "Massey Ferguson" },
+  { id: 5, label: "John Deere" },
   { id: 6, label: "Eicher" },
+  { id: 7, label: "Farmtrac" },
+  { id: 8, label: "Powertrac" },
+  { id: 14, label: "New Holland" },
 ];
 
 const SORT_OPTIONS = [
@@ -110,6 +113,13 @@ const Tractors = () => {
       setLoading(false);
     }
   }, [filters, activeBrand]);
+
+  useEffect(() => {
+  window.scrollTo({
+    top: 0,
+    behavior: "instant"
+  });
+}, []);
 
   useEffect(() => { fetchData(); }, []); // eslint-disable-line
 

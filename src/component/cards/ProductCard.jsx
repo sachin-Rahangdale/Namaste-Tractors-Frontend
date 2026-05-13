@@ -15,6 +15,7 @@ const ProductCard = ({ data, categoryMeta }) => {
       {/* Rectangle Image */}
       <div className="w-full aspect-[16/9] overflow-hidden bg-white mb-3 rounded-sm">
         <img
+          loading='lazy'
           src={data.imageUrl || "https://placehold.co/400x300/f3f4f6/9ca3af?text=No+Image"}
           alt={data.productName}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"

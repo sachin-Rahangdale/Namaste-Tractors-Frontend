@@ -71,6 +71,7 @@ const ImageSlider = ({ images }) => {
     <div className="flex flex-col gap-3 w-full">
       <div className="relative w-full aspect-[4/3] bg-white rounded-2xl overflow-hidden group border border-gray-200">
         <img
+          loading="lazy"
           key={current}
           src={allImages[current]}
           alt={`Slide ${current + 1}`}
@@ -102,7 +103,7 @@ const ImageSlider = ({ images }) => {
                 i === current ? "border-green-600 shadow-sm p-1" : "border-gray-200 p-2 opacity-70 hover:opacity-100"
               }`}
             >
-              <img src={src} className="w-full h-full object-contain" alt="" />
+              <img loading="lazy" src={src} className="w-full h-full object-contain" alt="" />
             </button>
           ))}
         </div>

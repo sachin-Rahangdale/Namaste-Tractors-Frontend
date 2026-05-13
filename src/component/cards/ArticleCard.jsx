@@ -12,6 +12,7 @@ const ArticleCard = ({ data, featured }) => {
       {/* Image */}
       <div className="w-full aspect-[16/9] overflow-hidden bg-white mb-3 rounded-sm relative">
         <img
+          loading='lazy'
           src={data.mainImageUrl}
           alt={data.title}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"

@@ -139,7 +139,7 @@ setSameTypeArticles(sameType);
         const imgUrl = gallery.shift();
         elements.push(
           <div key={`img-${idx}`} className="my-10 rounded-[2rem] overflow-hidden border border-slate-100 shadow-md aspect-video">
-            <img src={imgUrl} alt="" className="w-full h-full object-cover" />
+            <img loading="lazy" src={imgUrl} alt="" className="w-full h-full object-cover" />
           </div>
         );
       }
@@ -149,7 +149,7 @@ setSameTypeArticles(sameType);
       const imgUrl = gallery.shift();
       elements.push(
         <div key={`rem-${gallery.length}`} className="my-10 rounded-[2rem] overflow-hidden border border-slate-100 shadow-md aspect-video">
-          <img src={imgUrl} alt="" className="w-full h-full object-cover" />
+          <img loading="lazy" src={imgUrl} alt="" className="w-full h-full object-cover" />
         </div>
       );
     }
@@ -214,6 +214,7 @@ setSameTypeArticles(sameType);
           {article.mainImageUrl && (
             <div className="rounded-[2.5rem] overflow-hidden border border-slate-100 shadow-xl shadow-slate-200/40 aspect-[16/8]">
               <img
+                loading="lazy"
                 src={article.mainImageUrl}
                 alt={article.title}
                 className="w-full h-full object-cover"
@@ -416,7 +417,10 @@ setSameTypeArticles(sameType);
                 <div className="h-px w-16 bg-slate-200" />
               </div>
               <button
-                onClick={() => navigate("/articles")}
+                onClick={() => {
+  navigate("/articles");
+  window.scrollTo(0, 0);
+}}
                 className="text-[9px] font-black text-slate-400 hover:text-green-600 uppercase tracking-widest transition-colors"
               >
                 All Articles →

@@ -13,15 +13,15 @@ const AdminHome = () => {
       color: "from-blue-600 to-blue-700",
     },
     {
-      title: "Field Enquiries",
-      desc: "View and respond to leads from farmers in Vidarbha.",
+      title: "Manage Enquiries",
+      desc: "View and respond to enquiries of Farmers.",
       icon: "📩",
       path: "/admin/enquiries",
       color: "from-orange-500 to-orange-600",
     },
     {
       title: "Tractor Brands",
-      desc: "Update the list of manufacturers and brand logos.",
+      desc: "Update the list of tractor manufacturers.",
       icon: "🏷️",
       path: "/admin/brands",
       color: "from-green-600 to-green-700",
@@ -96,8 +96,8 @@ const AdminHome = () => {
       {/* Quick Access Footer */}
       <div className="bg-slate-900 rounded-[3rem] p-10 mt-12 flex flex-col md:flex-row items-center justify-between gap-6">
           <div className="text-center md:text-left">
-             <p className="text-green-400 font-black text-xs uppercase tracking-widest">System Overview</p>
-             <h4 className="text-white text-xl font-bold mt-1">Review pending enquiries and manage your active listings.</h4>
+             <p className="text-green-400 font-black text-xs uppercase tracking-widest">Nmaste Tractor </p>
+             <h4 className="text-white text-xl font-bold mt-1">A platform to meet all the needs of Indian Farmers.</h4>
           </div>
           <button 
             onClick={() => navigate("/")}

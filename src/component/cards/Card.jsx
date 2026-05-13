@@ -12,6 +12,7 @@ const Card = ({ data }) => {
       {/* Rectangle Image */}
       <div className="w-full aspect-[16/9] overflow-hidden bg-white mb-3 rounded-sm">
         <img
+          loading='lazys'
           src={data.imageUrl}
           alt={data.model}
           className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
