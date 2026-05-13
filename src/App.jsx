@@ -14,7 +14,6 @@ import Footer from "./component/layout/Footer";
 
 // Admin Imports
 import AdminLayout from "./routes/AdminLayout";
-import AdminHome from "./pages/admin/AdminHome";
 import ProductDetail from "./pages/ProductDetail";
 import ManageEnquiries from "./pages/admin/ManageEnquiries";
 import ManageBrands from "./pages/admin/ManageBrands";
@@ -22,6 +21,7 @@ import ManageTractors from "./pages/admin/ManageTractors";
 import TractorForm from "./component/admin/TractorForm";
 import ManageArticles from "./pages/admin/ManageArticles";
 import ManageProducts from "./pages/admin/ManageProduct";
+import AdminHome from "./pages/admin/AdminHome";
 
 
 function App() {
@@ -35,7 +35,7 @@ function App() {
       <div className="flex-grow">
         <Routes>
           {/* PUBLIC & USER ROUTES */}
-          <Route path="/" element={<Home />} />
+          <Route path="/" element={<AdminHome/>} />
           <Route path="/login" element={user ? <Navigate to="/" /> : <Auth />} />
           <Route path="/tractors" element={<Tractors />} />
           <Route path="/tractor/:id" element={<TractorDetail />} />
@@ -59,7 +59,7 @@ function App() {
             path="/admin" 
             element={isAdmin ? <AdminLayout /> : <Navigate to="/login" />}
           >
-            <Route index element={<AdminHome />} />
+            <Route index element={<Home />} />
             <Route path="tractors" element={<ManageTractors/>} />
             <Route path="tractors/new" element={<TractorForm />} />
     <Route path="tractors/edit/:id" element={<TractorForm />} />
