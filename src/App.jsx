@@ -15,12 +15,13 @@ import Footer from "./component/layout/Footer";
 // Admin Imports
 import AdminLayout from "./routes/AdminLayout";
 import ProductDetail from "./pages/ProductDetail";
-import ManageEnquiries from "./pages/admin/ManageEnquiries";
-import ManageBrands from "./pages/admin/ManageBrands";
-import ManageTractors from "./pages/admin/ManageTractors";
+import ManageEnquiries from "./pages/Admin/ManageEnquiries";
+import ManageBrands from "./pages/Admin/ManageBrands";
+import ManageTractors from "./pages/Admin/ManageTractors";
 import TractorForm from "./component/admin/TractorForm";
-import ManageArticles from "./pages/admin/ManageArticles";
-import ManageProducts from "./pages/admin/ManageProduct";
+import ManageArticles from "./pages/Admin/ManageArticles";
+import ManageProducts from "./pages/Admin/ManageProduct";
+import AdminHome from "./pages/admin/AdminHome";
 
 
 
