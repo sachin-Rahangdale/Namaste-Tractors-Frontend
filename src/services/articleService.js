@@ -15,7 +15,7 @@ export const getArticles = async (page = 0, size = 10) => {
 
 export const getArticleBySlug = async (slug) => {
   try {
-    const response = await api.get(`/articles/${slug}`);
+    const response = await api.get(`/articles/slug/${slug}`);
     return response.data;
   } catch (error) {
     console.error("Error fetching article details:", error);
