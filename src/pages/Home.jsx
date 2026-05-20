@@ -1,205 +1,162 @@
 import React, { useEffect, useState } from "react";
-import { getTractors } from "../services/tractorService";
-import { getArticles } from "../services/articleService";
-import { getProducts } from "../services/productService";
-import Card from "../component/cards/Card";
+
+import Navbar from "../component/layout/Navbar";
+import ExploreSection from "../component/common/ExploreSection";
+import HorizontalTractorSection from "../component/home/HorizontalTractorSection";
+import HomeSectionHeader from "../component/home/HomeSectionHeader";
+import SkeletonCard from "../component/home/SkeletonCard";
 import ArticleCard from "../component/cards/ArticleCard";
 import ProductCard from "../component/cards/ProductCard";
 import EnquiryForm from "../component/common/EnquiryForm";
-import Navbar from "../component/layout/Navbar";
-import Footer from "../component/layout/Footer";
-import { Link } from "react-router-dom";
+
+import { getTractors } from "../services/tractorService";
+import { getArticles } from "../services/articleService";
+import { getProducts } from "../services/productService";
 
 const Home = () => {
   const [tractors, setTractors] = useState([]);
-  const [tractorPage, setTractorPage] = useState(0);
-  const [isTractorLast, setIsTractorLast] = useState(false);
-
   const [articles, setArticles] = useState([]);
-  const [articlePage, setArticlePage] = useState(0);
-  const [isArticleLast, setIsArticleLast] = useState(false);
-
   const [products, setProducts] = useState([]);
-  const [productPage, setProductPage] = useState(0);
-  const [isProductLast, setIsProductLast] = useState(false);
+
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const fetchTractors = async () => {
-      try {
-        const res = await getTractors(tractorPage, 4);
-        setTractors((prev) => {
-          const existingIds = new Set(prev.map(item => item.id));
-          const uniqueNewData = res.content.filter(item => !existingIds.has(item.id));
-          return [...prev, ...uniqueNewData];
-        });
-        setIsTractorLast(res.last);
-      } catch (err) { console.error(err); }
-    };
-    fetchTractors();
-  }, [tractorPage]);
+    window.scrollTo(0, 0);
 
-  useEffect(() => {
-    const fetchArticlesData = async () => {
+    const loadHomeData = async () => {
       try {
-        const res = await getArticles(articlePage, 4);
-        setArticles((prev) => {
-          const existingIds = new Set(prev.map(item => item.id));
-          const uniqueNewData = res.content.filter(item => !existingIds.has(item.id));
-          return [...prev, ...uniqueNewData];
-        });
-        setIsArticleLast(res.last);
-      } catch (err) { console.error(err); }
-    };
-    fetchArticlesData();
-  }, [articlePage]);
+        const [tractorRes, articleRes, productRes] = await Promise.all([
+          getTractors(0, 8),
+          getArticles(0, 4),
+          getProducts(0, 4),
+        ]);
 
-  useEffect(() => {
-    const fetchProductsData = async () => {
-      try {
-        const res = await getProducts(productPage, 4);
-        setProducts((prev) => {
-          const existingIds = new Set(prev.map(item => item.id));
-          const uniqueNewData = res.content.filter(item => !existingIds.has(item.id));
-          return [...prev, ...uniqueNewData];
-        });
-        setIsProductLast(res.last);
-      } catch (err) { console.error(err); }
+        setTractors(tractorRes.content || []);
+        setArticles(articleRes.content || []);
+        setProducts(productRes.content || []);
+      } catch (err) {
+        console.error("Home page loading failed", err);
+      } finally {
+        setLoading(false);
+      }
     };
-    fetchProductsData();
-  }, [productPage]);
+
+    loadHomeData();
+  }, []);
 
   return (
-    <div style={{ background: 'var(--color-surface)' }} className="min-h-screen">
+    <div className="min-h-screen bg-[#F4F7F4] overflow-x-hidden">
+
       <Navbar />
 
-      <div style={{ background: 'linear-gradient(135deg, #0F3D2E 0%, #1a5c40 100%)' }}>
-        <div className="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 py-8">
-          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-            <div>
-              <h1 className="text-2xl font-bold text-white leading-tight">
-                Find Your Perfect Tractor
-              </h1>
-              <p className="text-green-300 text-sm mt-1">
-                Reviews, pricing &amp; dealer support for India's farmers.
-              </p>
-            </div>
-            <div className="flex gap-3 shrink-0">
-              <Link
-                to="/tractors"
-                className="px-5 py-2.5 rounded-xl text-sm font-semibold transition-colors"
-                style={{ background: '#FBBF24', color: '#0F3D2E' }}
-              >
-                Browse Tractors
-              </Link>
-              <Link
-                to="/articles"
-                className="px-5 py-2.5 rounded-xl text-sm font-semibold text-white transition-colors"
-                style={{ background: 'rgba(255,255,255,0.12)', border: '1px solid rgba(255,255,255,0.18)' }}
-              >
-                Articles
-              </Link>
-            </div>
-          </div>
-        </div>
+      {/* HERO + ACTIONS */}
+      <ExploreSection />
+
+      {/* TRACTORS */}
+      <div className="mt-2">
+        <HorizontalTractorSection
+          tractors={tractors}
+          loading={loading}
+        />
       </div>
 
-      {/* ── MAIN CONTENT ──────────────────────────────────────────── */}
-      <main className="max-w-[90rem] mx-auto px-4 sm:px-6 lg:px-8 pb-10 pt-10 space-y-12">
+      {/* ARTICLES */}
+      <section className="px-4 py-5">
+        <HomeSectionHeader
+          title="Latest Articles"
+          to="/articles"
+          linkText="View All"
+        />
 
-        {/* Tractors Section */}
-        <section className="fade-up">
-          <SectionHeader title="Featured Tractors" to="/tractors" linkText="View All" />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {tractors.map(t => <Card key={t.id} data={t} />)}
-          </div>
-          {!isTractorLast && (
-            <div className="mt-8 text-center">
-              <button
-                onClick={() => setTractorPage(p => p + 1)}
-                className="px-8 py-2.5 rounded-xl font-bold text-sm border-2 border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition-all shadow-sm"
-              >
-                Load More Tractors ↓
-              </button>
-            </div>
-          )}
-        </section>
+        <div className="grid grid-cols-1 gap-4 mt-4">
+          {loading
+            ? [...Array(2)].map((_, i) => (
+                <SkeletonCard key={i} />
+              ))
+            : articles.map((article) => (
+                <ArticleCard
+                  key={article.id}
+                  data={article}
+                />
+              ))}
+        </div>
+      </section>
 
-        {/* Articles Section */}
-        <section>
-          <SectionHeader title="Expert Articles" to="/articles" linkText="Read All" />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {articles.map(a => <ArticleCard key={a.id} data={a} />)}
-          </div>
-          {!isArticleLast && (
-            <div className="mt-8 text-center">
-              <button
-                onClick={() => setArticlePage(p => p + 1)}
-                className="px-8 py-2.5 rounded-xl font-bold text-sm border-2 border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition-all shadow-sm"
-              >
-                Load More Articles ↓
-              </button>
-            </div>
-          )}
-        </section>
+      {/* PRODUCTS */}
+      <section className="px-4 py-3">
+        <HomeSectionHeader
+          title="Farm Products"
+          to="/products"
+          linkText="View All"
+        />
 
-        {/* Products Section */}
-        <section>
-          <SectionHeader title="Machinery &amp; Products" to="/products" linkText="See All" />
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-            {products.map(p => <ProductCard key={p.id} data={p} />)}
-          </div>
-          {!isProductLast && (
-            <div className="mt-8 text-center">
-              <button
-                onClick={() => setProductPage(p => p + 1)}
-                className="px-8 py-2.5 rounded-xl font-bold text-sm border-2 border-gray-200 text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition-all shadow-sm"
-              >
-                Load More Products ↓
-              </button>
-            </div>
-          )}
-        </section>
+        <div className="grid grid-cols-2 gap-3 mt-4">
+          {loading
+            ? [...Array(4)].map((_, i) => (
+                <SkeletonCard key={i} />
+              ))
+            : products.map((product) => (
+                <ProductCard
+                  key={product.id}
+                  data={product}
+                />
+              ))}
+        </div>
+      </section>
 
-        {/* Trust Bar (Shifted below Products) */}
-        <section className="rounded-3xl p-8 text-center"
-          style={{ background: 'linear-gradient(135deg, #0F3D2E, #1a5c40)' }}>
-          <p className="text-green-300 text-xs font-black uppercase tracking-widest mb-4">Trusted by Farmers Across India</p>
-          <div className="flex flex-wrap justify-center gap-8 md:gap-16">
+      {/* TRUST SECTION */}
+      <section className="px-4 py-6">
+        <div className="bg-gradient-to-br from-[#0F3D2E] to-[#1B5E42] rounded-[2rem] p-5 shadow-lg">
+
+          <p className="text-center text-green-300 text-[11px] uppercase tracking-[0.25em] font-black mb-5">
+            Trusted By Farmers
+          </p>
+
+          <div className="grid grid-cols-2 gap-3">
+
             {[
-              { icon: '✅', label: 'Farming Advice' },
-              { icon: '📞', label: 'Expert Support' },
-              { icon: '💳', label: 'Sell Froducts' },
-              { icon: '🏛️', label: 'Subsidy Info' },
-            ].map(item => (
-              <div key={item.label} className="flex items-center gap-2 text-white">
-                <span className="text-xl">{item.icon}</span>
-                <span className="font-bold text-sm">{item.label}</span>
+              {
+                icon: "🚜",
+                label: "New Tractors",
+              },
+              {
+                icon: "📞",
+                label: "Support",
+              },
+              {
+                icon: "💰",
+                label: "Sell Products",
+              },
+              {
+                icon: "🌾",
+                label: "Farming Tips",
+              },
+            ].map((item) => (
+              <div
+                key={item.label}
+                className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 text-center"
+              >
+                <div className="text-3xl mb-2">
+                  {item.icon}
+                </div>
+
+                <p className="text-white text-sm font-bold">
+                  {item.label}
+                </p>
               </div>
             ))}
-          </div>
-        </section>
 
-        {/* Enquiry Form */}
+          </div>
+        </div>
+      </section>
+
+      {/* ENQUIRY */}
+      <div className="px-4 pt-2 pb-12">
         <EnquiryForm />
-      </main>
+      </div>
+
     </div>
   );
 };
-
-/* ── Section Header Helper ─────────────────────────────────────── */
-const SectionHeader = ({ title, to, linkText }) => (
-  <div className="flex justify-between items-center mb-8">
-    <div className="flex items-center gap-3">
-      <h2 className="text-xl font-bold text-gray-900">{title}</h2>
-      <div className="section-divider" />
-    </div>
-    <Link
-      to={to}
-      className="text-[#0F3D2E] font-bold text-sm hover:underline underline-offset-4 shrink-0 ml-4"
-    >
-      {linkText} →
-    </Link>
-  </div>
-);
 
 export default Home;
