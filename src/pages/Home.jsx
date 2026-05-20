@@ -68,41 +68,61 @@ const Home = () => {
           linkText="View All"
         />
 
-        <div className="grid grid-cols-1 gap-4 mt-4">
+        <div className="flex gap-3 overflow-x-auto pb-2 mt-4 no-scrollbar snap-x snap-mandatory">
           {loading
-            ? [...Array(2)].map((_, i) => (
-                <SkeletonCard key={i} />
-              ))
-            : articles.map((article) => (
-                <ArticleCard
-                  key={article.id}
-                  data={article}
-                />
-              ))}
+           ? [...Array(4)].map((_, i) => (
+        <div
+          key={i}
+            className="min-w-[270px] max-w-[270px] shrink-0 snap-start"
+        >
+           <SkeletonCard />
+           </div>
+         ))
+          : articles.map((article) => (
+       <div
+          key={article.id}
+          className="min-w-[270px] max-w-[270px] shrink-0 snap-start"
+        >
+           <ArticleCard data={article} />
+           </div>
+         ))}
         </div>
       </section>
 
       {/* PRODUCTS */}
       <section className="px-4 py-3">
-        <HomeSectionHeader
-          title="Farm Products"
-          to="/products"
-          linkText="View All"
-        />
 
-        <div className="grid grid-cols-2 gap-3 mt-4">
-          {loading
-            ? [...Array(4)].map((_, i) => (
-                <SkeletonCard key={i} />
-              ))
-            : products.map((product) => (
-                <ProductCard
-                  key={product.id}
-                  data={product}
-                />
-              ))}
-        </div>
-      </section>
+  <HomeSectionHeader
+    title="Farm Products"
+    to="/products"
+    linkText="View All"
+  />
+
+  <div className="flex gap-3 overflow-x-auto pb-2 mt-4 no-scrollbar snap-x snap-mandatory">
+
+    {loading
+  ? [...Array(4)].map((_, i) => (
+      <div
+        key={i}
+        className="min-w-[250px] max-w-[250px] shrink-0 snap-start"
+      >
+        <SkeletonCard />
+      </div>
+    ))
+  : products.map((product) => (
+      <div
+        key={product.id}
+        className="min-w-[250px] max-w-[250px] shrink-0 snap-start"
+      >
+        <ProductCard
+          data={product}
+        />
+      </div>
+    ))}
+
+  </div>
+
+</section>
 
       {/* TRUST SECTION */}
       <section className="px-4 py-6">
