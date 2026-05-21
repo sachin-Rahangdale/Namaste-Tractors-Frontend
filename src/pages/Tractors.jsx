@@ -13,7 +13,7 @@ const FontLink = () => (
   `}</style>
 );
 
-// ── Brand chips (add more as your backend grows) ──────────────────────────────
+// ── Brand chips ──────────────────────────────────────────────────────────────
 const BRANDS = [
   { id: null, label: "All Brands" },
   { id: 1, label: "Mahindra" },
@@ -35,17 +35,16 @@ const SORT_OPTIONS = [
   { value: "hp_desc", label: "HP: High → Low" },
 ];
 
-// ── Skeleton card ─────────────────────────────────────────────────────────────
+// ── Skeleton card optimized for mobile view grids ──────────────────────────────
 const SkeletonCard = () => (
-  <div className="bg-white rounded-3xl overflow-hidden border border-gray-100 animate-pulse">
-    <div className="bg-gray-100 h-52 w-full" />
-    <div className="p-5 space-y-3">
-      <div className="h-3 bg-gray-100 rounded-full w-1/3" />
-      <div className="h-5 bg-gray-100 rounded-full w-2/3" />
-      <div className="h-3 bg-gray-100 rounded-full w-1/2" />
-      <div className="flex justify-between pt-2">
-        <div className="h-6 bg-gray-100 rounded-full w-1/3" />
-        <div className="h-8 bg-gray-100 rounded-2xl w-1/3" />
+  <div className="bg-white border border-gray-100 animate-pulse">
+    <div className="bg-gray-100 h-36 sm:h-52 w-full" />
+    <div className="p-3 sm:p-5 space-y-2 sm:space-y-3">
+      <div className="h-3 bg-gray-100 rounded-full w-2/3" />
+      <div className="h-4 bg-gray-100 rounded-full w-1/2" />
+      <div className="flex gap-2 pt-2">
+        <div className="h-5 bg-gray-100 rounded-full w-1/2" />
+        <div className="h-5 bg-gray-100 rounded-full w-1/2" />
       </div>
     </div>
   </div>
@@ -64,7 +63,6 @@ const sortTractors = (list, sortKey) => {
   }
 };
 
-// ── Main Component ────────────────────────────────────────────────────────────
 const Tractors = () => {
   const [tractors, setTractors] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -72,8 +70,9 @@ const Tractors = () => {
   const [totalElements, setTotalElements] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [filtersOpen, setFiltersOpen] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
 
-  const [activeBrand, setActiveBrand] = useState(null);  // brandId or null
+  const [activeBrand, setActiveBrand] = useState(null);
   const [sortKey, setSortKey] = useState("");
 
   const [filters, setFilters] = useState({
@@ -85,7 +84,6 @@ const Tractors = () => {
   const [pendingFilters, setPendingFilters] = useState({ ...filters });
   const gridRef = useRef(null);
 
-  // ── Data loading ────────────────────────────────────────────────────────────
   const fetchData = useCallback(async (overrideFilters = filters, brandId = activeBrand) => {
     setLoading(true);
     setError(null);
@@ -115,15 +113,11 @@ const Tractors = () => {
   }, [filters, activeBrand]);
 
   useEffect(() => {
-  window.scrollTo({
-    top: 0,
-    behavior: "instant"
-  });
-}, []);
+    window.scrollTo({ top: 0, behavior: "instant" });
+  }, []);
 
   useEffect(() => { fetchData(); }, []); // eslint-disable-line
 
-  // ── Handlers ────────────────────────────────────────────────────────────────
   const handleApplyFilters = () => {
     const next = { ...pendingFilters, page: 0 };
     setFilters(next);
@@ -155,67 +149,71 @@ const Tractors = () => {
     window.scrollTo({ top: 0, behavior: "smooth" });
   };
 
-  const hasActiveFilters =
-    filters.minHp || filters.maxHp || filters.minPrice ||
-    filters.maxPrice || activeBrand;
+  const hasActiveFilters = filters.minHp || filters.maxHp || filters.minPrice || filters.maxPrice || activeBrand;
 
-  const displayedTractors = sortTractors(tractors, sortKey);
+  const searchedTractors = tractors.filter((tractor) => {
+    const search = searchTerm.toLowerCase();
+    return (
+      tractor.model?.toLowerCase().includes(search) ||
+      tractor.brand?.toLowerCase().includes(search) ||
+      tractor.hp?.toString().includes(search)
+    );
+  });
 
-  // ── Render ──────────────────────────────────────────────────────────────────
+  const displayedTractors = sortTractors(searchedTractors, sortKey);
+
   return (
     <>
       <FontLink />
       <div className="min-h-screen" style={{ background: "#ebe8e3" }}>
         <Navbar />
 
-        {/* ── HERO ──────────────────────────────────────────────────────────── */}
+        {/* ── HERO SECTION (RESPONSIVE) ─────────────────────────────────────── */}
         <div className="bg-green-50 border-b border-green-100">
-          <div className="max-w-[1440px] mx-auto px-6 py-10">
-            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-6">
-
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-6 py-6 sm:py-10">
+            <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-6">
               {/* Text */}
               <div>
-                <span className="text-xs font-semibold text-green-700 uppercase tracking-widest">
-                  🚜 Namaste Tractor
+                <span className="text-[10px] sm:text-xs font-semibold text-green-700 uppercase tracking-widest">
+                   Bars 🚜 Namaste Tractor
                 </span>
-                <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mt-1 leading-snug">
+                <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 mt-0.5 leading-snug">
                   Find Your <span className="text-green-700">Perfect Tractor</span>
                 </h1>
-                <p className="text-gray-500 mt-2 text-sm max-w-md">
+                <p className="text-gray-500 mt-1.5 text-xs sm:text-sm max-w-md">
                   India's trusted marketplace — on-road pricing, subsidy guidance & expert support.
                 </p>
               </div>
 
-              {/* Stats */}
-              <div className="flex gap-3 flex-shrink-0">
+              {/* Stats Container with horizontal native scrolling on small displays */}
+              <div className="flex gap-2 sm:gap-3 overflow-x-auto no-scrollbar -mx-4 px-4 sm:mx-0 sm:px-0">
                 {[
                   { label: "Models", value: totalElements || "500+" },
                   { label: "HP Range", value: "15–120 HP" },
                   { label: "Price Range", value: "₹3L – ₹50L+" },
                 ].map(s => (
-                  <div key={s.label} className="bg-white border border-green-100 rounded-2xl px-4 py-3 text-center shadow-sm">
-                    <p className="text-base font-bold text-gray-900">{s.value}</p>
-                    <p className="text-xs text-gray-400 mt-0.5">{s.label}</p>
+                  <div key={s.label} className="bg-white border border-green-100 rounded-xl px-3 sm:px-4 py-2 sm:py-3 text-center shadow-sm flex-shrink-0 min-w-[100px]">
+                    <p className="text-sm sm:text-base font-bold text-gray-900">{s.value}</p>
+                    <p className="text-[10px] text-gray-400 mt-0.5">{s.label}</p>
                   </div>
                 ))}
               </div>
-
             </div>
           </div>
         </div>
 
         {/* ── BRAND CHIPS ───────────────────────────────────────────────────── */}
-        <div className="bg-white border-b border-gray-100 sticky top-0 z-40 shadow-sm">
-          <div className="max-w-[1440px] mx-auto px-6">
-            <div className="flex items-center gap-2 py-3 overflow-x-auto no-scrollbar">
+        <div className="bg-white border-b border-gray-100 sticky top-[108px] md:top-[72px] z-40 shadow-sm">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-6">
+            <div className="flex items-center gap-2 py-2.5 overflow-x-auto no-scrollbar mask-edges">
               {BRANDS.map(b => (
                 <button
                   key={b.id ?? "all"}
                   onClick={() => handleBrandClick(b.id)}
-                  className="flex-shrink-0 px-4 py-2 rounded-full text-sm font-semibold transition-all duration-200 whitespace-nowrap"
+                  className="flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs sm:text-sm font-semibold transition-all duration-200 whitespace-nowrap"
                   style={
                     activeBrand === b.id
-                      ? { background: "#0F3D2E", color: "#fff", transform: "scale(1.04)" }
+                      ? { background: "#0F3D2E", color: "#fff" }
                       : { background: "#F3F4F6", color: "#374151" }
                   }
                 >
@@ -226,77 +224,72 @@ const Tractors = () => {
           </div>
         </div>
 
-        {/* ── CONTENT ───────────────────────────────────────────────────────── */}
-        <div className="max-w-[1440px] mx-auto px-6 py-8" ref={gridRef}>
+        {/* ── SEARCH BAR ───────────────────────────────────────────────────── */}
+        <div className="bg-white border-b border-gray-100">
+          <div className="max-w-[1440px] mx-auto px-4 sm:px-6 py-3 sm:py-4">
+            <div className="relative max-w-2xl">
+              <input
+                type="text"
+                placeholder="Search tractor, brand or HP..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full bg-[#F7F7F5] border border-gray-200 rounded-xl pl-10 sm:pl-12 pr-4 py-2.5 sm:py-3.5 text-xs sm:text-sm font-medium text-gray-800 shadow-sm outline-none focus:ring-2 transition-all"
+                style={{ "--tw-ring-color": "#0F3D2E" }}
+              />
+              <svg
+                className="w-4 h-4 text-gray-400 absolute left-3.5 top-1/2 -translate-y-1/2"
+                fill="none" stroke="currentColor" viewBox="0 0 24 24"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-4.35-4.35m1.85-5.15a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </div>
+          </div>
+        </div>
+
+        {/* ── CONTENT CONTAINER ─────────────────────────────────────────────── */}
+        <div className="max-w-[1440px] mx-auto px-3 sm:px-6 py-6 sm:py-8" ref={gridRef}>
 
           {/* ── TOOLBAR ─────────────────────────────────────────────────────── */}
-          <div className="flex flex-wrap items-center justify-between gap-4 mb-8">
-            {/* Result count */}
+          <div className="flex flex-wrap items-center justify-between gap-3 mb-6">
             <div>
               {!loading && (
-                <p className="text-gray-700 font-semibold text-sm">
+                <p className="text-gray-700 font-semibold text-xs sm:text-sm">
                   {hasActiveFilters ? (
                     <><span style={{ color: "#0F3D2E" }} className="font-bold">{totalElements}</span> results found</>
                   ) : (
-                    <>Showing <span style={{ color: "#0F3D2E" }} className="font-bold">{tractors.length}</span> of {totalElements} tractors</>
+                    <>Showing <span style={{ color: "#0F3D2E" }} className="font-bold">{tractors.length}</span> of {totalElements} models</>
                   )}
                 </p>
               )}
             </div>
 
-            <div className="flex items-center gap-3">
-              {/* Sort */}
+            <div className="flex items-center gap-2">
               <div className="relative">
                 <select
                   value={sortKey}
                   onChange={e => setSortKey(e.target.value)}
-                  className="appearance-none pl-4 pr-10 py-2.5 rounded-2xl text-sm font-medium bg-white border border-gray-200 text-gray-700 focus:outline-none focus:ring-2 cursor-pointer"
-                  style={{ "--tw-ring-color": "#0F3D2E" }}
+                  className="appearance-none pl-3 pr-8 py-2 rounded-xl text-xs sm:text-sm font-medium bg-white border border-gray-200 text-gray-700 outline-none cursor-pointer"
                 >
                   {SORT_OPTIONS.map(o => (
                     <option key={o.value} value={o.value}>{o.label}</option>
                   ))}
                 </select>
-                <svg className="absolute right-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
-                  fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg className="absolute right-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                 </svg>
               </div>
 
-              {/* Filter toggle */}
               <button
                 onClick={() => setFiltersOpen(o => !o)}
-                className="flex items-center gap-2 px-5 py-2.5 rounded-2xl text-sm font-semibold transition-all"
-                style={
-                  filtersOpen || hasActiveFilters
-                    ? { background: "#0F3D2E", color: "#fff" }
-                    : { background: "#fff", color: "#374151", border: "1px solid #E5E7EB" }
-                }
+                className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-xs sm:text-sm font-semibold transition-all"
+                style={filtersOpen || hasActiveFilters ? { background: "#0F3D2E", color: "#fff" } : { background: "#fff", color: "#374151", border: "1px solid #E5E7EB" }}
               >
-                <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                    d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2a1 1 0 01-.293.707L13 13.414V19a1 1 0 01-.553.894l-4 2A1 1 0 017 21v-7.586L3.293 6.707A1 1 0 013 6V4z" />
-                </svg>
                 Filters
-                {hasActiveFilters && (
-                  <span className="ml-1 w-5 h-5 flex items-center justify-center rounded-full text-xs font-bold"
-                    style={{ background: "#FBBF24", color: "#000" }}>
-                    !
-                  </span>
-                )}
               </button>
 
-              {/* Reset */}
               {hasActiveFilters && (
-                <button
-                  onClick={handleReset}
-                  className="flex items-center gap-1 px-4 py-2.5 rounded-2xl text-sm font-medium text-red-500 hover:bg-red-50 transition-all border border-red-100"
-                >
-                  <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
-                      d="M6 18L18 6M6 6l12 12" />
-                  </svg>
-                  Clear All
+                <button onClick={handleReset} className="flex items-center text-xs font-semibold text-red-500 px-2 py-2 hover:bg-red-50 rounded-xl transition-all">
+                  Clear
                 </button>
               )}
             </div>
@@ -304,184 +297,75 @@ const Tractors = () => {
 
           {/* ── FILTER PANEL ────────────────────────────────────────────────── */}
           {filtersOpen && (
-            <div className="mb-8 bg-white border border-gray-100 rounded-3xl p-6 shadow-lg"
-              style={{ animation: "slideDown 0.2s ease" }}>
-              <style>{`
-                @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-                .no-scrollbar::-webkit-scrollbar { display: none; }
-                .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-              `}</style>
-              <h3 className="font-display text-lg font-bold text-gray-800 mb-5">Refine Results</h3>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-                {/* Min HP */}
+            <div className="mb-6 bg-white border border-gray-100 rounded-2xl p-4 sm:p-6 shadow-lg" style={{ animation: "slideDown 0.2s ease" }}>
+              <h3 className="font-display text-base font-bold text-gray-800 mb-4">Refine Results</h3>
+              <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4">
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Min HP</label>
-                  <input
-                    type="number" min="0" placeholder="e.g. 20"
-                    className="w-full px-4 py-3 bg-gray-50 rounded-2xl text-sm outline-none focus:ring-2 transition-all"
-                    style={{ "--tw-ring-color": "#0F3D2E" }}
-                    value={pendingFilters.minHp}
-                    onChange={e => setPendingFilters(p => ({ ...p, minHp: e.target.value }))}
-                  />
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Min HP</label>
+                  <input type="number" className="w-full px-3 py-2 bg-gray-50 rounded-xl text-xs outline-none" value={pendingFilters.minHp} onChange={e => setPendingFilters(p => ({ ...p, minHp: e.target.value }))} />
                 </div>
-                {/* Max HP */}
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Max HP</label>
-                  <input
-                    type="number" min="0" placeholder="e.g. 80"
-                    className="w-full px-4 py-3 bg-gray-50 rounded-2xl text-sm outline-none focus:ring-2 transition-all"
-                    style={{ "--tw-ring-color": "#0F3D2E" }}
-                    value={pendingFilters.maxHp}
-                    onChange={e => setPendingFilters(p => ({ ...p, maxHp: e.target.value }))}
-                  />
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Max HP</label>
+                  <input type="number" className="w-full px-3 py-2 bg-gray-50 rounded-xl text-xs outline-none" value={pendingFilters.maxHp} onChange={e => setPendingFilters(p => ({ ...p, maxHp: e.target.value }))} />
                 </div>
-                {/* Min Price */}
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Min Budget (₹)</label>
-                  <input
-                    type="number" min="0" placeholder="e.g. 300000"
-                    className="w-full px-4 py-3 bg-gray-50 rounded-2xl text-sm outline-none focus:ring-2 transition-all"
-                    style={{ "--tw-ring-color": "#0F3D2E" }}
-                    value={pendingFilters.minPrice}
-                    onChange={e => setPendingFilters(p => ({ ...p, minPrice: e.target.value }))}
-                  />
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Min Price</label>
+                  <input type="number" className="w-full px-3 py-2 bg-gray-50 rounded-xl text-xs outline-none" value={pendingFilters.minPrice} onChange={e => setPendingFilters(p => ({ ...p, minPrice: e.target.value }))} />
                 </div>
-                {/* Max Price */}
                 <div>
-                  <label className="block text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Max Budget (₹)</label>
-                  <input
-                    type="number" min="0" placeholder="e.g. 2000000"
-                    className="w-full px-4 py-3 bg-gray-50 rounded-2xl text-sm outline-none focus:ring-2 transition-all"
-                    style={{ "--tw-ring-color": "#0F3D2E" }}
-                    value={pendingFilters.maxPrice}
-                    onChange={e => setPendingFilters(p => ({ ...p, maxPrice: e.target.value }))}
-                  />
+                  <label className="block text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-1">Max Price</label>
+                  <input type="number" className="w-full px-3 py-2 bg-gray-50 rounded-xl text-xs outline-none" value={pendingFilters.maxPrice} onChange={e => setPendingFilters(p => ({ ...p, maxPrice: e.target.value }))} />
                 </div>
               </div>
-              <div className="flex gap-3 mt-6">
-                <button
-                  onClick={handleApplyFilters}
-                  className="px-8 py-3 rounded-2xl text-white font-bold text-sm transition-all hover:opacity-90 active:scale-95"
-                  style={{ background: "#0F3D2E" }}
-                >
-                  Apply Filters
-                </button>
-                <button
-                  onClick={() => {
-                    setPendingFilters({ minHp: "", maxHp: "", minPrice: "", maxPrice: "", page: 0, size: 12 });
-                    setFiltersOpen(false);
-                    handleReset();
-                  }}
-                  className="px-6 py-3 rounded-2xl text-gray-500 font-medium text-sm bg-gray-50 hover:bg-gray-100 transition-all"
-                >
-                  Clear
-                </button>
+              <div className="flex gap-2 mt-5">
+                <button onClick={handleApplyFilters} className="px-5 py-2 rounded-xl text-white font-bold text-xs" style={{ background: "#0F3D2E" }}>Apply Filters</button>
+                <button onClick={() => { setPendingFilters({ minHp: "", maxHp: "", minPrice: "", maxPrice: "", page: 0, size: 12 }); setFiltersOpen(false); handleReset(); }} className="px-4 py-2 rounded-xl text-gray-500 bg-gray-50 text-xs">Clear</button>
               </div>
             </div>
           )}
 
-          {/* ── ERROR STATE ──────────────────────────────────────────────────── */}
-          {error && (
-            <div className="text-center py-20 bg-white rounded-3xl border border-red-100 mb-8">
-              <div className="text-5xl mb-4">⚠️</div>
-              <h3 className="text-xl font-bold text-gray-800">Something went wrong</h3>
-              <p className="text-gray-400 mt-2 mb-6">{error}</p>
-              <button
-                onClick={() => fetchData()}
-                className="px-6 py-3 rounded-2xl text-white text-sm font-bold"
-                style={{ background: "#0F3D2E" }}
-              >
-                Try Again
-              </button>
-            </div>
-          )}
-
-          {/* ── GRID ────────────────────────────────────────────────────────── */}
+          {/* ── TWIN CARD GRID MATRIX (2 COLUMNS FOR SMARTPHONES) ────────────── */}
           {!error && (
             <main>
               {loading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
-                  {Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)}
+                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
+                  {Array.from({ length: 8 }).map((_, i) => <SkeletonCard key={i} />)}
                 </div>
               ) : displayedTractors.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+                <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6">
                   {displayedTractors.map(tractor => (
                     <Card key={tractor.id} data={tractor} />
                   ))}
                 </div>
               ) : (
-                <div className="text-center py-40 bg-white rounded-3xl border border-dashed border-gray-200">
-                  <div className="text-6xl mb-4">🚜</div>
-                  <h3 className="font-display text-2xl font-bold text-gray-800">No Tractors Found</h3>
-                  <p className="text-gray-400 mt-2 max-w-xs mx-auto">
-                    Try adjusting your filters or clearing them to discover more models.
-                  </p>
-                  <button
-                    onClick={handleReset}
-                    className="mt-6 px-6 py-3 rounded-2xl text-white text-sm font-bold"
-                    style={{ background: "#0F3D2E" }}
-                  >
-                    Reset Filters
-                  </button>
+                <div className="text-center py-24 bg-white rounded-2xl border border-dashed border-gray-200 px-4">
+                  <div className="text-5xl mb-3">🚜</div>
+                  <h3 className="font-display text-xl font-bold text-gray-800">No Tractors Found</h3>
+                  <p className="text-gray-400 text-xs mt-1 max-w-xs mx-auto">Try resetting filters to explore more models.</p>
+                  <button onClick={handleReset} className="mt-4 px-5 py-2.5 rounded-xl text-white text-xs font-bold" style={{ background: "#0F3D2E" }}>Reset Filters</button>
                 </div>
               )}
 
               {/* ── PAGINATION ──────────────────────────────────────────────── */}
               {!loading && totalPages > 1 && (
-                <div className="mt-12 flex items-center justify-center gap-2 flex-wrap">
-                  {/* Prev */}
-                  <button
-                    onClick={() => handlePageChange(filters.page - 1)}
-                    disabled={filters.page === 0}
-                    className="w-10 h-10 flex items-center justify-center rounded-2xl border text-sm font-medium transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:border-gray-400"
-                    style={{ background: "#fff", borderColor: "#E5E7EB" }}
-                  >
-                    ‹
-                  </button>
-
-                  {/* Page numbers */}
+                <div className="mt-10 flex items-center justify-center gap-1.5 flex-wrap">
+                  <button onClick={() => handlePageChange(filters.page - 1)} disabled={filters.page === 0} className="w-8 h-8 flex items-center justify-center rounded-xl border text-xs disabled:opacity-30 bg-white">‹</button>
                   {Array.from({ length: totalPages }, (_, i) => i).map(p => {
-                    const visible =
-                      p === 0 || p === totalPages - 1 ||
-                      Math.abs(p - filters.page) <= 1;
-                    const isEllipsis =
-                      !visible &&
-                      (p === 1 || p === totalPages - 2) &&
-                      Math.abs(p - filters.page) === 2;
-                    if (!visible && !isEllipsis) return null;
-                    if (isEllipsis) return <span key={p} className="px-1 text-gray-400">…</span>;
-
+                    const visible = p === 0 || p === totalPages - 1 || Math.abs(p - filters.page) <= 1;
+                    if (!visible) return null;
                     return (
-                      <button
-                        key={p}
-                        onClick={() => handlePageChange(p)}
-                        className="w-10 h-10 flex items-center justify-center rounded-2xl text-sm font-semibold transition-all"
-                        style={
-                          p === filters.page
-                            ? { background: "#0F3D2E", color: "#fff" }
-                            : { background: "#fff", color: "#374151", border: "1px solid #E5E7EB" }
-                        }
-                      >
+                      <button key={p} onClick={() => handlePageChange(p)} className="w-8 h-8 flex items-center justify-center rounded-xl text-xs font-bold" style={p === filters.page ? { background: "#0F3D2E", color: "#fff" } : { background: "#fff", color: "#374151", border: "1px solid #E5E7EB" }}>
                         {p + 1}
                       </button>
                     );
                   })}
-
-                  {/* Next */}
-                  <button
-                    onClick={() => handlePageChange(filters.page + 1)}
-                    disabled={filters.page >= totalPages - 1}
-                    className="w-10 h-10 flex items-center justify-center rounded-2xl border text-sm font-medium transition-all disabled:opacity-30 disabled:cursor-not-allowed hover:border-gray-400"
-                    style={{ background: "#fff", borderColor: "#E5E7EB" }}
-                  >
-                    ›
-                  </button>
+                  <button onClick={() => handlePageChange(filters.page + 1)} disabled={filters.page >= totalPages - 1} className="w-8 h-8 flex items-center justify-center rounded-xl border text-xs disabled:opacity-30 bg-white">›</button>
                 </div>
               )}
             </main>
           )}
 
-          <div className="mt-16 pb-8">
+          <div className="mt-12">
             <EnquiryForm defaultType="tractor" />
           </div>
         </div>

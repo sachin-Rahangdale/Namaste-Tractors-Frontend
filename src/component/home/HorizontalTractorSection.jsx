@@ -5,27 +5,7 @@ const HorizontalTractorSection = ({ tractors, loading }) => {
   return (
     <section className="px-4 py-5 bg-[#F4F7F4] overflow-hidden">
 
-      {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-
-        <div>
-          <p className="text-[11px] uppercase tracking-[0.25em] text-[#5C7A6D] font-black mb-1">
-            Explore
-          </p>
-
-          <h2 className="text-2xl md:text-3xl font-black text-gray-900 tracking-tight leading-none">
-            Popular Tractors
-          </h2>
-        </div>
-
-        <Link
-          to="/tractors"
-          className="text-[#0F3D2E] text-sm font-black whitespace-nowrap"
-        >
-          View All
-        </Link>
-
-      </div>
+      
 
       {/* Horizontal Scroll */}
       <div className="flex gap-3 overflow-x-auto pb-2 no-scrollbar snap-x snap-mandatory">

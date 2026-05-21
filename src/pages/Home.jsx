@@ -3,7 +3,6 @@ import React, { useEffect, useState } from "react";
 import Navbar from "../component/layout/Navbar";
 import ExploreSection from "../component/common/ExploreSection";
 import HorizontalTractorSection from "../component/home/HorizontalTractorSection";
-import HomeSectionHeader from "../component/home/HomeSectionHeader";
 import SkeletonCard from "../component/home/SkeletonCard";
 import ArticleCard from "../component/cards/ArticleCard";
 import ProductCard from "../component/cards/ProductCard";
@@ -12,6 +11,8 @@ import EnquiryForm from "../component/common/EnquiryForm";
 import { getTractors } from "../services/tractorService";
 import { getArticles } from "../services/articleService";
 import { getProducts } from "../services/productService";
+
+import { Link } from "react-router-dom";
 
 const Home = () => {
   const [tractors, setTractors] = useState([]);
@@ -49,128 +50,146 @@ const Home = () => {
 
       <Navbar />
 
-      {/* HERO + ACTIONS */}
+      {/* HERO */}
       <ExploreSection />
 
+      <br />
+
       {/* TRACTORS */}
-      <div className="mt-2">
+      <section className="bg-gradient-to-b from-[#EEF4EF] to-[#F4F7F4] py-5">
+
+        <div className="px-4 mb-4">
+
+          <p className="text-[11px] uppercase tracking-[0.25em] text-[#5C7A6D] font-black mb-1">
+            Explore
+          </p>
+
+          <h2 className="text-2xl font-black text-gray-900 tracking-tight">
+            Popular Tractors
+          </h2>
+
+        </div>
+
         <HorizontalTractorSection
           tractors={tractors}
           loading={loading}
         />
-      </div>
+
+        <div className="px-4 mt-5">
+          <Link
+            to="/tractors"
+            className="w-full flex items-center justify-center bg-[#0F3D2E] text-white py-3 rounded-lg font-black text-sm tracking-wide"
+          >
+            View All Tractors
+          </Link>
+        </div>
+
+      </section>
+
+      <br />
 
       {/* ARTICLES */}
-      <section className="px-4 py-5">
-        <HomeSectionHeader
-          title="Latest Articles"
-          to="/articles"
-          linkText="View All"
-        />
+      <section className="bg-gradient-to-b from-[#FFF6F7] to-[#F4F7F4] py-5">
 
-        <div className="flex gap-3 overflow-x-auto pb-2 mt-4 no-scrollbar snap-x snap-mandatory">
-          {loading
-           ? [...Array(4)].map((_, i) => (
-        <div
-          key={i}
-            className="min-w-[270px] max-w-[270px] shrink-0 snap-start"
-        >
-           <SkeletonCard />
-           </div>
-         ))
-          : articles.map((article) => (
-       <div
-          key={article.id}
-          className="min-w-[270px] max-w-[270px] shrink-0 snap-start"
-        >
-           <ArticleCard data={article} />
-           </div>
-         ))}
-        </div>
-      </section>
+        <div className="px-4 mb-4">
 
-      {/* PRODUCTS */}
-      <section className="px-4 py-3">
-
-  <HomeSectionHeader
-    title="Farm Products"
-    to="/products"
-    linkText="View All"
-  />
-
-  <div className="flex gap-3 overflow-x-auto pb-2 mt-4 no-scrollbar snap-x snap-mandatory">
-
-    {loading
-  ? [...Array(4)].map((_, i) => (
-      <div
-        key={i}
-        className="min-w-[250px] max-w-[250px] shrink-0 snap-start"
-      >
-        <SkeletonCard />
-      </div>
-    ))
-  : products.map((product) => (
-      <div
-        key={product.id}
-        className="min-w-[250px] max-w-[250px] shrink-0 snap-start"
-      >
-        <ProductCard
-          data={product}
-        />
-      </div>
-    ))}
-
-  </div>
-
-</section>
-
-      {/* TRUST SECTION */}
-      <section className="px-4 py-6">
-        <div className="bg-gradient-to-br from-[#0F3D2E] to-[#1B5E42] rounded-[2rem] p-5 shadow-lg">
-
-          <p className="text-center text-green-300 text-[11px] uppercase tracking-[0.25em] font-black mb-5">
-            Trusted By Farmers
+          <p className="text-[11px] uppercase tracking-[0.25em] text-[#C26D7C] font-black mb-1">
+            Farming News
           </p>
 
-          <div className="grid grid-cols-2 gap-3">
+          <h2 className="text-2xl font-black text-gray-900 tracking-tight">
+            Latest Articles
+          </h2>
 
-            {[
-              {
-                icon: "🚜",
-                label: "New Tractors",
-              },
-              {
-                icon: "📞",
-                label: "Support",
-              },
-              {
-                icon: "💰",
-                label: "Sell Products",
-              },
-              {
-                icon: "🌾",
-                label: "Farming Tips",
-              },
-            ].map((item) => (
-              <div
-                key={item.label}
-                className="bg-white/10 backdrop-blur-sm rounded-2xl p-4 text-center"
-              >
-                <div className="text-3xl mb-2">
-                  {item.icon}
-                </div>
-
-                <p className="text-white text-sm font-bold">
-                  {item.label}
-                </p>
-              </div>
-            ))}
-
-          </div>
         </div>
+
+        <div className="flex gap-2 overflow-x-auto pb-2 px-4 no-scrollbar snap-x snap-mandatory">
+
+          {loading
+            ? [...Array(4)].map((_, i) => (
+                <div
+                  key={i}
+                  className="min-w-[255px] max-w-[255px] shrink-0 snap-start"
+                >
+                  <SkeletonCard />
+                </div>
+              ))
+            : articles.map((article) => (
+                <div
+                  key={article.id}
+                  className="min-w-[255px] max-w-[255px] shrink-0 snap-start"
+                >
+                  <ArticleCard data={article} />
+                </div>
+              ))}
+
+        </div>
+
+        <div className="px-4 mt-5">
+          <Link
+            to="/articles"
+            className="w-full flex items-center justify-center bg-[#C26D7C] text-white py-3 rounded-lg font-black text-sm tracking-wide"
+          >
+            View All Articles
+          </Link>
+        </div>
+
       </section>
 
+      <br />
+
+      {/* PRODUCTS */}
+      <section className="bg-gradient-to-b from-[#F2F6EA] to-[#F4F7F4] py-5">
+
+        <div className="px-4 mb-4">
+
+          <p className="text-[11px] uppercase tracking-[0.25em] text-[#7A8D3B] font-black mb-1">
+            Marketplace
+          </p>
+
+          <h2 className="text-2xl font-black text-gray-900 tracking-tight">
+            Farm Products
+          </h2>
+
+        </div>
+
+        <div className="flex gap-2 overflow-x-auto pb-2 px-4 no-scrollbar snap-x snap-mandatory">
+
+          {loading
+            ? [...Array(4)].map((_, i) => (
+                <div
+                  key={i}
+                  className="min-w-[240px] max-w-[240px] shrink-0 snap-start"
+                >
+                  <SkeletonCard />
+                </div>
+              ))
+            : products.map((product) => (
+                <div
+                  key={product.id}
+                  className="min-w-[240px] max-w-[240px] shrink-0 snap-start"
+                >
+                  <ProductCard data={product} />
+                </div>
+              ))}
+
+        </div>
+
+        <div className="px-4 mt-5">
+          <Link
+            to="/products"
+            className="w-full flex items-center justify-center bg-[#6B7C2F] text-white py-3 rounded-lg font-black text-sm tracking-wide"
+          >
+            View All Products
+          </Link>
+        </div>
+
+      </section>
+
+      <br />
+
       {/* ENQUIRY */}
+      
       <div className="px-4 pt-2 pb-12">
         <EnquiryForm />
       </div>

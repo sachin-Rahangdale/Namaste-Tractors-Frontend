@@ -3,97 +3,107 @@ import { useNavigate } from "react-router-dom";
 
 const ProductCard = ({ data, categoryMeta }) => {
   const navigate = useNavigate();
-
   const accent = categoryMeta?.accent ?? "#0F3D2E";
+
+  // "Gram Gram" ya similar metadata items ke title duplication check ke liye logic
+  const formatTitle = (title) => {
+    if (!title) return "";
+    const words = title.split(" ");
+    if (words.length > 1 && words[0].toLowerCase() === words[1].toLowerCase()) {
+      return words.slice(1).join(" ");
+    }
+    return title;
+  };
+
+  const displayTitle = formatTitle(data.productName);
 
   return (
     <div
       onClick={() => navigate(`/product/${data.id}`)}
-      className="bg-[#DDE5DF] p-2 rounded-md cursor-pointer h-full"
+      className="bg-[#DDE5DF] p-1 sm:p-2 rounded-none cursor-pointer h-full transition-transform duration-200"
     >
+      {/* Inner Card - Symmetrical geometry layout with completely sharp edges */}
+      <div className="bg-white rounded-none overflow-hidden border border-gray-200/80 shadow-sm h-full flex flex-col active:scale-[0.99] md:active:scale-100 transition-all duration-200">
 
-      {/* Inner Card */}
-      <div className="bg-white rounded-md overflow-hidden border border-gray-200 shadow-sm h-full flex flex-col transition-all duration-300">
-
-        {/* Image */}
-        <div className="aspect-[16/10] overflow-hidden bg-gray-100">
+        {/* Image Frame */}
+        <div className="aspect-[14/10] sm:aspect-[16/10] overflow-hidden bg-gray-50 rounded-none">
           <img
             loading="lazy"
             src={
               data.imageUrl ||
               "https://placehold.co/400x300/f3f4f6/9ca3af?text=No+Image"
             }
-            alt={data.productName}
-            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+            alt={displayTitle}
+            className="w-full h-full object-cover transition-transform duration-500 md:hover:scale-105 rounded-none"
           />
         </div>
 
-        {/* Content */}
-        <div className="p-4 flex flex-col flex-1">
+        {/* Content Details Matrix */}
+        <div className="p-2.5 sm:p-4 flex flex-col flex-grow">
 
-          {/* Product Name */}
+          {/* Product Name Title Header */}
           <h3
-            className="font-black text-[0.98rem] text-gray-900 leading-[1.25] tracking-tight line-clamp-2 min-h-[42px]"
+            className="font-extrabold text-xs sm:text-[0.98rem] text-gray-900 leading-tight tracking-tight line-clamp-2 min-h-[32px] sm:min-h-[42px]"
             style={{ color: "#111827" }}
           >
-            {data.productName}
+            {displayTitle}
           </h3>
 
-          {/* Location */}
-          <div className="flex items-center gap-1 text-gray-500 text-xs mt-1">
+          {/* Bottom Controls: Price info & Action Button */}
+          <div className="mt-auto pt-2 sm:pt-3">
 
-            <svg
-              className="w-3 h-3 shrink-0"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
-              />
+            {/* Location Row - Rendered perfectly in a single row right above the price */}
+            {data.city && (
+              <div className="flex items-center gap-1 text-gray-400 text-[10px] sm:text-xs font-bold uppercase tracking-wider mb-1.5">
+                <svg
+                  className="w-3 h-3 shrink-0 text-gray-400"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.5}
+                    d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"
+                  />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2.5}
+                    d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
+                  />
+                </svg>
+                <span className="line-clamp-1">{data.city}</span>
+              </div>
+            )}
 
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"
-              />
-            </svg>
-
-            <span className="line-clamp-1 font-medium">
-              {data.city}
-            </span>
-
-          </div>
-
-          {/* Bottom */}
-          <div className="mt-auto pt-4">
-
-            {/* Price */}
-            <div className="flex items-end justify-between gap-2">
-
-              <p
-                className="text-[1.65rem] font-black tracking-tight leading-none"
+            {/* Price + Unit Single-Row Layout */}
+            <div className="flex items-baseline gap-1 sm:gap-1.5 flex-wrap">
+              <span
+                className="text-xl sm:text-2xl font-black tracking-tight leading-none"
                 style={{ color: accent }}
               >
-                ₹{data.price.toLocaleString()}
-              </p>
-
-              <span className="text-[10px] font-bold text-gray-500 bg-[#EEF2EF] px-2 py-1 rounded-md whitespace-nowrap">
-                per {data.unit}
+                ₹{data.price ? data.price.toLocaleString('en-IN') : '0'}
               </span>
-
+              
+              {data.unit && (
+                <span className="text-xs sm:text-sm font-medium text-gray-400 lowercase whitespace-nowrap">
+                  / {data.unit}
+                </span>
+              )}
             </div>
 
-            {/* Button */}
+            {/* Sharp Action Button */}
             <button
-              className="mt-4 w-full py-3 rounded-lg text-sm font-black text-white transition-all active:scale-[0.98]"
+              onClick={(e) => {
+                e.stopPropagation();
+                navigate(`/product/${data.id}`);
+              }}
+              className="mt-3 w-full py-2 sm:py-2.5 rounded-none text-xs sm:text-sm font-black text-white transition-all active:scale-[0.98] tracking-wide"
               style={{ backgroundColor: accent }}
             >
-              View Product
+              Place Order / View
             </button>
 
           </div>

@@ -1,3 +1,5 @@
+import React from "react";
+
 export default function TractorTable({
   tractors,
   loading,
@@ -9,139 +11,111 @@ export default function TractorTable({
   brands,
 }) {
   const brandName = (id) =>
-    brands.find(
-      (b) =>
-        String(b.id) === String(id)
-    )?.name ?? "-";
+    brands.find((b) => String(b.id) === String(id))?.name ?? "-";
 
   return (
     <>
-      <div className="bg-[#111827] border border-slate-800 rounded-3xl overflow-hidden shadow-[0_10px_40px_rgba(0,0,0,0.35)]">
+      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
         {loading ? (
-          <div className="flex flex-col items-center justify-center py-28 text-slate-400">
-            <div className="w-12 h-12 border-4 border-yellow-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-
-            Loading tractors...
+          <div className="flex flex-col items-center justify-center py-24 text-slate-400 bg-white">
+            <div className="w-10 h-10 border-4 border-green-600 border-t-transparent rounded-full animate-spin mb-4"></div>
+            <p className="text-xs font-bold uppercase tracking-wider text-gray-400">Loading tractors catalog...</p>
           </div>
         ) : tractors.length === 0 ? (
-          <div className="flex flex-col items-center justify-center py-28 text-slate-400">
-            <div className="text-7xl mb-4">
-              🚜
-            </div>
-
-            <p className="text-xl">
-              No tractors found
-            </p>
+          <div className="flex flex-col items-center justify-center py-24 text-slate-400 bg-white">
+            <div className="text-6xl mb-3">🚜</div>
+            <p className="text-base font-bold text-gray-800">No tractors found</p>
           </div>
         ) : (
-          <div className="overflow-x-auto">
-            <table className="w-full">
-              <thead className="bg-[#0b1120]">
-                <tr className="text-slate-400 uppercase text-sm">
-                  <th className="px-6 py-4 text-left">
-                    Model
-                  </th>
-
-                  <th className="px-6 py-4 text-left">
-                    Brand
-                  </th>
-
-                  <th className="px-6 py-4 text-left">
-                    HP
-                  </th>
-
-                  <th className="px-6 py-4 text-left">
-                    Price
-                  </th>
-
-                  <th className="px-6 py-4 text-left">
-                    Actions
-                  </th>
+          /* Responsive Layout Horizontal Scroll Wrapper */
+          <div className="overflow-x-auto no-scrollbar">
+            <table className="w-full min-w-[800px] border-collapse text-left">
+              
+              {/* Premium Dark Table Header Definition */}
+              <thead className="bg-slate-900 border-b border-slate-800 text-slate-200 text-xs font-black uppercase tracking-wider">
+                <tr>
+                  <th className="px-6 py-4 w-[35%]">Model Variant</th>
+                  <th className="px-6 py-4 w-[20%]">Manufacturer</th>
+                  <th className="px-6 py-4 w-[15%]">HP Category</th>
+                  <th className="px-6 py-4 w-[15%]">Ex-Showroom Price</th>
+                  <th className="px-6 py-4 w-[15%] text-right">Actions</th>
                 </tr>
               </thead>
 
-              <tbody>
+              {/* Data Rows Body Framework */}
+              <tbody className="divide-y divide-gray-100 bg-white">
                 {tractors.map((t) => {
-                  const mainImg =
-                    t.images?.find(
-                      (i) =>
-                        i.imageType ===
-                        "MAIN"
-                    );
+                  const mainImg = t.images?.find((i) => i.imageType === "MAIN");
 
                   return (
                     <tr
                       key={t.id}
-                      className="border-t border-slate-800 hover:bg-slate-800/40 transition"
+                      className="hover:bg-slate-50/80 transition-colors"
                     >
-                      <td className="px-6 py-5">
-                        <div className="flex items-center gap-4">
+                      {/* COLUMN 1: THUMBNAIL + TITLE LOGS */}
+                      <td className="px-6 py-4">
+                        <div className="flex items-center gap-4 min-w-0">
                           {mainImg ? (
                             <img
-                              src={
-                                mainImg.imageUrl
-                              }
+                              src={mainImg.imageUrl}
                               alt={t.model}
-                              className="w-20 h-16 rounded-xl object-cover border border-slate-700"
+                              loading="lazy"
+                              className="w-20 h-14 rounded-xl object-cover border border-gray-200 shrink-0"
                             />
                           ) : (
-                            <div className="w-20 h-16 rounded-xl bg-slate-800 flex items-center justify-center text-2xl">
+                            <div className="w-20 h-14 rounded-xl bg-gray-100 border border-gray-200 flex items-center justify-center text-xl shrink-0">
                               🚜
                             </div>
                           )}
 
-                          <div>
-                            <p className="text-white font-bold text-lg">
+                          <div className="min-w-0 flex-1">
+                            <h4 className="text-sm font-extrabold text-gray-900 truncate leading-snug">
                               {t.model}
-                            </p>
-
-                            <p className="text-slate-500 text-xs mt-1">
-                              ID: {t.id}
+                            </h4>
+                            <p className="text-gray-400 text-[11px] font-bold uppercase tracking-wider mt-0.5">
+                              ID: #{t.id}
                             </p>
                           </div>
                         </div>
                       </td>
 
-                      <td className="px-6 py-5">
-                        <span className="bg-yellow-500/10 text-yellow-400 px-3 py-1 rounded-full text-xs font-semibold">
-                          {t.brand ??
-                            brandName(
-                              t.brandId
-                            )}
+                      {/* COLUMN 2: BRAND MANUFACTURER ACCENT TAG */}
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="bg-gray-100 text-gray-700 border border-gray-200 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide">
+                          {t.brand ?? brandName(t.brandId)}
                         </span>
                       </td>
 
-                      <td className="px-6 py-5">
-                        <span className="bg-emerald-500/10 text-emerald-400 px-3 py-1 rounded-full text-xs font-semibold">
-                          {t.hp} HP
+                      {/* COLUMN 3: HORSEPOWER POWER ACCENT TAG */}
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="bg-emerald-50 text-emerald-700 border border-emerald-100 px-2.5 py-1 rounded-full text-[10px] font-extrabold uppercase tracking-wide">
+                          {t.hp} HP Class
                         </span>
                       </td>
 
-                      <td className="px-6 py-5 text-white font-semibold text-lg">
-                        ₹
-                        {Number(
-                          t.price ?? 0
-                        ).toLocaleString(
-                          "en-IN"
-                        )}
+                      {/* COLUMN 4: EX-SHOWROOM VALUE DISPLAY */}
+                      <td className="px-6 py-4 whitespace-nowrap">
+                        <span className="text-sm font-black text-slate-900">
+                          ₹{Number(t.price ?? 0).toLocaleString("en-IN")}
+                        </span>
                       </td>
 
-                      <td className="px-6 py-5">
-                        <div className="flex gap-3">
+                      {/* COLUMN 5: UPDATE/DELETE PARAMETERS BUTTON ACTIONS */}
+                      <td className="px-6 py-4 whitespace-nowrap text-right">
+                        <div className="flex items-center justify-end gap-2">
                           <button
-                            onClick={() =>
-                              onEdit(t)
-                            }
-                            className="bg-sky-500/15 hover:bg-sky-500/25 text-sky-400 px-4 py-2 rounded-xl transition font-medium"
+                            onClick={() => onEdit(t)}
+                            className="bg-blue-50 hover:bg-blue-100 text-blue-600 border border-blue-100 px-3 py-1.5 rounded-xl transition text-xs font-extrabold uppercase tracking-wider"
                           >
                             Edit
                           </button>
-
                           <button
-                            onClick={() =>
-                              onDelete(t)
-                            }
-                            className="bg-rose-500/15 hover:bg-rose-500/25 text-rose-400 px-4 py-2 rounded-xl transition font-medium"
+                            onClick={() => {
+                              if (window.confirm(`Verre, delete entry for "${t.model}"?`)) {
+                                onDelete(t);
+                              }
+                            }}
+                            className="bg-rose-50 hover:bg-rose-100 text-rose-600 border border-rose-100 px-3 py-1.5 rounded-xl transition text-xs font-extrabold uppercase tracking-wider"
                           >
                             Delete
                           </button>
@@ -156,45 +130,37 @@ export default function TractorTable({
         )}
       </div>
 
-      {/* PAGINATION */}
-      {totalPages > 1 && (
-        <div className="flex justify-center items-center gap-3 mt-8">
+      {/* ── PAGINATION PIPELINE SEGMENT (BALANCED CURVES TINT) ──────────────── */}
+      {!loading && totalPages > 1 && (
+        <div className="flex justify-center items-center gap-2 mt-8">
           <button
             disabled={page === 0}
-            onClick={() =>
-              setPage((p) => p - 1)
-            }
-            className="px-5 py-3 rounded-xl bg-[#111827] border border-slate-800 text-slate-300 disabled:opacity-40"
+            onClick={() => setPage((p) => p - 1)}
+            className="px-4 py-2 rounded-xl bg-white border border-gray-200 text-gray-600 font-bold text-xs uppercase tracking-wider shadow-sm disabled:opacity-40 transition"
           >
             Prev
           </button>
 
-          {Array.from(
-            { length: totalPages },
-            (_, i) => (
+          <div className="flex items-center gap-1.5">
+            {Array.from({ length: totalPages }, (_, i) => (
               <button
                 key={i}
                 onClick={() => setPage(i)}
-                className={`w-11 h-11 rounded-xl font-bold transition
-                ${
+                className={`w-9 h-9 rounded-xl font-black text-xs transition border ${
                   page === i
-                    ? "bg-yellow-500 text-black"
-                    : "bg-[#111827] border border-slate-800 text-slate-300"
+                    ? "bg-green-600 text-white border-green-600 shadow-sm"
+                    : "bg-white border-gray-200 text-gray-600 hover:bg-gray-50"
                 }`}
               >
                 {i + 1}
               </button>
-            )
-          )}
+            ))}
+          </div>
 
           <button
-            disabled={
-              page >= totalPages - 1
-            }
-            onClick={() =>
-              setPage((p) => p + 1)
-            }
-            className="px-5 py-3 rounded-xl bg-[#111827] border border-slate-800 text-slate-300 disabled:opacity-40"
+            disabled={page >= totalPages - 1}
+            onClick={() => setPage((p) => p + 1)}
+            className="px-4 py-2 rounded-xl bg-white border border-gray-200 text-gray-600 font-bold text-xs uppercase tracking-wider shadow-sm disabled:opacity-40 transition"
           >
             Next
           </button>
@@ -203,4 +169,3 @@ export default function TractorTable({
     </>
   );
 }
-

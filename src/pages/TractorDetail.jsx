@@ -4,119 +4,36 @@ import Navbar from "../component/layout/Navbar";
 import Card from "../component/cards/Card";
 import EnquiryForm from "../component/common/EnquiryForm";
 import { getTractorById, getTractorsByBrand, getTractors } from "../services/tractorService";
+import ImageSlider from "./tractordetail/ImageSlider";
+import SpecTable from "./tractordetail/SpecTable";
 
-/* ─── Image Slider ──────────────────────────────────────────────────────────── */
-const ImageSlider = ({ images }) => {
-  const [current, setCurrent] = useState(0);
-
-  const allImages = images?.length > 0
-    ? images.map(i => i.imageUrl)
-    : [];
-
-  const prev = useCallback(() => setCurrent(c => (c - 1 + allImages.length) % allImages.length), [allImages.length]);
-  const next = useCallback(() => setCurrent(c => (c + 1) % allImages.length), [allImages.length]);
-
-  useEffect(() => {
-    const handler = (e) => {
-      if (e.key === "ArrowLeft") prev();
-      if (e.key === "ArrowRight") next();
-    };
-    window.addEventListener("keydown", handler);
-    return () => window.removeEventListener("keydown", handler);
-  }, [prev, next]);
-
-  if (allImages.length === 0) {
-    return (
-      <div className="w-full aspect-[4/3] bg-gray-100 flex items-center justify-center rounded-2xl">
-        <div className="text-center text-gray-400">
-          <div className="text-5xl mb-3">🚜</div>
-          <p className="text-sm font-medium">No Images Available</p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="flex flex-col gap-4">
-      {/* Main slider */}
-      <div className="relative w-full aspect-[4/3] bg-gray-50 rounded-2xl overflow-hidden group">
-        <img
-          loading="lazy"
-          key={current}
-          src={allImages[current]}
-          alt={`Slide ${current + 1}`}
-          className="w-full h-full object-cover transition-opacity duration-300"
-        />
-
-        {/* Gradient overlays */}
-        <div className="absolute inset-0 bg-gradient-to-t from-black/30 via-transparent to-transparent pointer-events-none" />
-
-        {/* Image counter */}
-        {allImages.length > 1 && (
-          <div className="absolute top-4 right-4 bg-black/50 backdrop-blur-sm text-white text-xs font-medium px-3 py-1.5 rounded-full">
-            {current + 1} / {allImages.length}
-          </div>
-        )}
-
-        {/* Arrows */}
-        {allImages.length > 1 && (
-          <>
-            <button
-              onClick={prev}
-              className="absolute left-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 backdrop-blur-sm hover:bg-white text-gray-800 rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-              </svg>
-            </button>
-            <button
-              onClick={next}
-              className="absolute right-3 top-1/2 -translate-y-1/2 w-10 h-10 bg-white/90 backdrop-blur-sm hover:bg-white text-gray-800 rounded-full flex items-center justify-center shadow-lg opacity-0 group-hover:opacity-100 transition-all duration-200 hover:scale-110"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-              </svg>
-            </button>
-          </>
-        )}
-
-        {/* Dot indicators */}
-        {allImages.length > 1 && (
-          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-1.5">
-            {allImages.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => setCurrent(i)}
-                className={`rounded-full transition-all duration-200 ${i === current ? "w-6 h-2 bg-white" : "w-2 h-2 bg-white/50 hover:bg-white/80"
-                  }`}
-              />
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* Thumbnails */}
-      {allImages.length > 1 && (
-        <div className="flex gap-2 overflow-x-auto pb-1">
-          {allImages.map((src, i) => (
-            <button
-              key={i}
-              onClick={() => setCurrent(i)}
-              className={`flex-shrink-0 w-20 h-14 rounded-xl overflow-hidden border-2 transition-all duration-200 ${i === current
-                ? "border-green-600 shadow-md shadow-green-200"
-                : "border-transparent opacity-60 hover:opacity-100 hover:border-gray-200"
-                }`}
-            >
-              <img loading="lazy" src={src} alt="" className="w-full h-full object-cover" />
-            </button>
-          ))}
-        </div>
-      )}
+/* ─── QuickSpec pill (SHARP EDGES OPTIMIZED) ─────────────────────────────────── */
+const QuickSpec = ({ label, value, icon }) => (
+  <div className="flex items-center gap-2.5 bg-stone-50 border border-stone-200 rounded-none p-2.5 transition-colors">
+    <span className="text-lg flex-shrink-0">{icon}</span>
+    <div className="min-w-0">
+      <p className="text-[9px] sm:text-[10px] font-black text-stone-500 uppercase tracking-wider">{label}</p>
+      <p className="text-xs sm:text-sm font-black text-stone-900 truncate">{value}</p>
     </div>
-  );
-};
+  </div>
+);
 
-/* ─── Main Component ─────────────────────────────────────────────────────────── */
+/* ─── Section heading ────────────────────────────────────────────────────────── */
+const SectionHeading = ({ title, action, onAction }) => (
+  <div className="flex items-baseline justify-between mb-4 border-b border-stone-200 pb-2">
+    <h2 className="text-base sm:text-lg font-black text-stone-900 tracking-tight">{title}</h2>
+    {action && (
+      <button
+        onClick={onAction}
+        className="text-xs font-bold text-emerald-800 uppercase tracking-wider hover:underline"
+      >
+        {action}
+      </button>
+    )}
+  </div>
+);
+
+/* ─── Main Component ──────────────────────────────────────────────────────────── */
 const TractorDetail = () => {
   const { id } = useParams();
   const navigate = useNavigate();
@@ -125,74 +42,59 @@ const TractorDetail = () => {
   const [brandRelated, setBrandRelated] = useState([]);
   const [generalRelated, setGeneralRelated] = useState([]);
   const [loading, setLoading] = useState(true);
-  const [activeTab, setActiveTab] = useState("engine");
+
+  // Memoized data loading pipeline to prevent flash re-renders on fast reload
+  const loadAllData = useCallback(async () => {
+    setLoading(true);
+    try {
+      const tractorRes = await getTractorById(id);
+      setTractor(tractorRes);
+      const bId = tractorRes.brandId || tractorRes.brand?.id;
+
+      const [brandRes, generalRes] = await Promise.all([
+        bId ? getTractorsByBrand(bId, 0, 5) : Promise.resolve({ content: [] }),
+        getTractors(0, 5),
+      ]);
+
+      const filterSelf = (list) => (list || []).filter(t => t.id !== parseInt(id)).slice(0, 4);
+
+      setBrandRelated(filterSelf(brandRes.content));
+      setGeneralRelated(filterSelf(generalRes.content));
+    } catch (err) {
+      console.error("Failed to load tractor ecosystem data:", err);
+    } finally {
+      setLoading(false);
+    }
+  }, [id]);
 
   useEffect(() => {
     window.scrollTo(0, 0);
     loadAllData();
-  }, [id]);
+  }, [loadAllData]);
 
-  const loadAllData = async () => {
-    setLoading(true);
-
-    try {
-
-      // First fetch tractor
-      const tractorRes = await getTractorById(id);
-
-      setTractor(tractorRes);
-
-      const bId = tractorRes.brandId || tractorRes.brand?.id;
-
-      // Run remaining APIs in parallel
-      const [brandRes, generalRes] = await Promise.all([
-        bId
-          ? getTractorsByBrand(bId, 0, 4)
-          : Promise.resolve({ content: [] }),
-
-        getTractors(0, 4)
-      ]);
-
-      setBrandRelated(
-        (brandRes.content || [])
-          .filter(t => t.id !== parseInt(id))
-      );
-
-      setGeneralRelated(
-        (generalRes.content || [])
-          .filter(t => t.id !== parseInt(id))
-      );
-
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  /* Loading */
+  /* ── Loading Spinner ── */
   if (loading) {
     return (
-      <div className="h-screen bg-gray-50 flex flex-col items-center justify-center gap-4">
-        <div className="w-12 h-12 border-4 border-green-600 border-t-transparent rounded-full animate-spin" />
-        <p className="text-gray-500 font-medium text-sm">Loading tractor details…</p>
+      <div className="h-screen bg-stone-50 flex flex-col items-center justify-center gap-3">
+        <div className="w-8 h-8 border-2 border-emerald-700 border-t-transparent animate-spin rounded-none" />
+        <p className="text-stone-500 font-bold text-[11px] uppercase tracking-widest">Loading Details…</p>
       </div>
     );
   }
 
-  /* Not found */
+  /* ── Not found ── */
   if (!tractor) {
     return (
-      <div className="min-h-screen bg-gray-50 flex flex-col">
+      <div className="min-h-screen bg-stone-50 flex flex-col">
         <Navbar />
-        <div className="flex-grow flex items-center justify-center">
-          <div className="text-center space-y-4">
-            <div className="text-7xl">🚜</div>
-            <h2 className="text-2xl font-bold text-gray-900">Tractor Not Found</h2>
-            <p className="text-gray-500 text-sm">This listing doesn't exist or has been removed.</p>
+        <div className="flex-grow flex items-center justify-center p-4">
+          <div className="text-center space-y-3 bg-white p-8 border border-stone-200">
+            <div className="text-5xl">🚜</div>
+            <h2 className="text-xl sm:text-2xl font-black text-stone-900 uppercase">Model Not Found</h2>
+            <p className="text-stone-500 text-sm font-medium">This variant has been removed or doesn't exist.</p>
             <button
               onClick={() => navigate("/tractors")}
-              className="mt-4 bg-green-600 hover:bg-green-700 text-white px-8 py-3 rounded-xl font-semibold text-sm transition-all"
+              className="mt-2 bg-slate-900 hover:bg-emerald-800 text-white px-6 py-3 rounded-none font-bold text-xs uppercase tracking-wider transition-colors"
             >
               Browse All Tractors
             </button>
@@ -203,305 +105,163 @@ const TractorDetail = () => {
   }
 
   const spec = tractor.specification || {};
-  const galleryImages = tractor.images || [];
-
-  const SPEC_TABS = [
-    {
-      id: "engine",
-      label: "Engine",
-      theme: {
-        bg: "bg-green-50/30",
-        border: "border-green-100",
-        iconBg: "bg-green-600",
-        accent: "text-green-700",
-        headerBg: "bg-green-50/80"
-      },
-      icon: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 3H5a2 2 0 00-2 2v4m6-6h10a2 2 0 012 2v4M9 3v18m0 0h10a2 2 0 002-2V9M9 21H5a2 2 0 01-2-2V9m0 0h18" />
-        </svg>
-      ),
-      rows: [
-        { label: "Horsepower", value: tractor.hp ? `${tractor.hp} HP` : null },
-        { label: "No. of Cylinders", value: spec.cylinder },
-        { label: "Engine Displacement", value: spec.engineCapacity ? `${spec.engineCapacity} cc` : null },
-        { label: "Max Torque", value: spec.torque ? `${spec.torque} Nm` : null },
-        { label: "Backup Torque", value: spec.backupTorque ? `${spec.backupTorque}%` : null },
-        { label: "Service Interval", value: spec.serviceInterval ? `Every ${spec.serviceInterval} hrs` : null },
-      ],
-    },
-    {
-      id: "transmission",
-      label: "Transmission",
-      theme: {
-        bg: "bg-blue-50/30",
-        border: "border-blue-100",
-        iconBg: "bg-blue-600",
-        accent: "text-blue-700",
-        headerBg: "bg-blue-50/80"
-      },
-      icon: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-        </svg>
-      ),
-      rows: [
-        { label: "Clutch Type", value: spec.clutch },
-        { label: "Gearbox", value: spec.gearbox },
-        { label: "PTO Horsepower", value: spec.ptoHp ? `${spec.ptoHp} HP` : null },
-        { label: "PTO Options", value: spec.ptoOptions },
-        { label: "Final Reduction", value: spec.reduction },
-      ],
-    },
-    {
-      id: "chassis",
-      label: "Chassis",
-      theme: {
-        bg: "bg-orange-50/30",
-        border: "border-orange-100",
-        iconBg: "bg-orange-600",
-        accent: "text-orange-700",
-        headerBg: "bg-orange-50/80"
-      },
-      icon: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 10h16M4 14h16M4 18h16" />
-        </svg>
-      ),
-      rows: [
-        { label: "Steering System", value: spec.steering },
-        { label: "Braking System", value: spec.brakes },
-        { label: "Front Axle", value: spec.frontAxle },
-        { label: "Rear Axle", value: spec.rearAxle },
-        { label: "Lifting Capacity", value: spec.liftCapacity ? `${spec.liftCapacity} kg` : null },
-      ],
-    },
-    {
-      id: "tyres",
-      label: "Tyres & Dims",
-      theme: {
-        bg: "bg-slate-50/50",
-        border: "border-slate-200",
-        iconBg: "bg-slate-600",
-        accent: "text-slate-700",
-        headerBg: "bg-slate-100/80"
-      },
-      icon: (
-        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <circle cx="12" cy="12" r="9" strokeWidth={2} stroke="currentColor" fill="none" />
-          <circle cx="12" cy="12" r="3" strokeWidth={2} stroke="currentColor" fill="none" />
-        </svg>
-      ),
-      rows: [
-        { label: "Front Tyre", value: spec.frontTyre },
-        { label: "Rear Tyre", value: spec.rearTyre },
-        { label: "Drive Type", value: spec.wheelDrive },
-      ],
-    },
-  ];
 
   return (
-    <div className="bg-gray-50 min-h-screen">
+    <div className="bg-[#ebe8e3] min-h-screen pb-12">
       <Navbar />
 
-      {/* ── BREADCRUMB ── */}
-      <div className="max-w-7xl mx-auto px-4 lg:px-10 py-4">
-        <nav className="flex items-center gap-2 text-sm text-gray-500">
-          <button onClick={() => navigate("/")} className="hover:text-green-700 font-medium transition-colors">Home</button>
-          <span className="text-gray-300">/</span>
-          <button onClick={() => navigate("/tractors")} className="hover:text-green-700 font-medium transition-colors">Tractors</button>
-          <span className="text-gray-300">/</span>
-          <span className="text-gray-800 font-semibold">{tractor.brand} {tractor.model}</span>
+      {/* ── Breadcrumb Wrap ── */}
+      <div className="max-w-[1140px] mx-auto px-3 sm:px-6 py-3">
+        <nav className="flex items-center gap-1.5 text-[10px] font-black text-stone-400 uppercase tracking-widest overflow-x-auto whitespace-nowrap no-scrollbar bg-white px-3 py-2 border border-stone-200 shadow-sm rounded-none">
+          <button onClick={() => navigate("/")} className="hover:text-emerald-700 transition-colors">
+            Home
+          </button>
+          <span className="text-stone-300">/</span>
+          <button onClick={() => navigate("/tractors")} className="hover:text-emerald-700 transition-colors">
+            Tractors
+          </button>
+          <span className="text-stone-300">/</span>
+          <span className="text-stone-800">{tractor.brand} {tractor.model}</span>
         </nav>
       </div>
 
-      <main className="max-w-7xl mx-auto px-4 lg:px-10 pb-20 space-y-10">
+      <main className="max-w-[1140px] mx-auto px-3 sm:px-6 space-y-6">
 
-        {/* ══ HERO ══════════════════════════════════════════════════════════════ */}
-        <div className="bg-white rounded-3xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-0">
+        {/* ════ HERO OVERVIEW PANEL ═════════════════════════════════════════════ */}
+        <div className="bg-white rounded-none border border-stone-200 shadow-sm overflow-hidden">
+          
+          {/* Image Slider Wrapper with high speed eager tag constraint */}
+          <div className="p-3 sm:p-6 bg-stone-50 border-b border-stone-200/80">
+            <ImageSlider images={tractor.images || []} />
+          </div>
 
-            {/* LEFT — Image Slider */}
-            <div className="p-6 lg:p-8 border-b lg:border-b-0 lg:border-r border-gray-100 bg-gray-50/50">
-              <ImageSlider images={galleryImages} />
+          {/* Info Details Presentation Field */}
+          <div className="p-4 sm:p-6 md:p-8 space-y-4">
+
+            {/* Badges Layout */}
+            <div className="flex flex-wrap items-center gap-2">
+              <span className="inline-flex items-center gap-1.5 bg-emerald-50 border border-emerald-100 text-emerald-800 text-[10px] font-black px-2.5 py-1 rounded-none uppercase tracking-wider">
+                {tractor.brand}
+              </span>
+              <span className="inline-flex items-center gap-1.5 bg-amber-50 border border-amber-100 text-amber-800 text-[10px] font-black px-2.5 py-1 rounded-none uppercase tracking-wider">
+                ⚡ {tractor.hp} HP Class
+              </span>
             </div>
 
-            {/* RIGHT — Info Panel */}
-            <div className="p-6 lg:p-10 flex flex-col justify-between gap-6">
+            {/* Model Title Variant */}
+            <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-stone-900 tracking-tight leading-none uppercase">
+              {tractor.model}
+            </h1>
+
+            {/* Price block - Premium colored accent row box */}
+            <div className="p-4 bg-[#F0FDF4] border-l-4 border-emerald-700 border-t border-b border-r border-gray-200/60 flex items-baseline rounded-none shadow-sm my-4">
               <div>
-                {/* Brand tag */}
-                <div className="inline-flex items-center gap-2 bg-green-50 border border-green-100 text-green-700 text-xs font-semibold px-3 py-1.5 rounded-full mb-4">
-                  <span className="w-2 h-2 bg-green-500 rounded-full" />
-                  {tractor.brand} · {tractor.hp} HP
-                </div>
-
-                {/* Title */}
-                <h1 className="text-4xl lg:text-5xl font-black text-gray-900 leading-tight mb-2 tracking-tighter uppercase italic">
-                  {tractor.model}
-                </h1>
-
-                {/* Price */}
-                <div className="flex items-baseline gap-3 mt-4 mb-6 pb-6 border-b border-gray-100">
-                  <span className="text-4xl font-black text-green-700 italic tracking-tight">
-                    ₹{tractor.price?.toLocaleString("en-IN")}
-                  </span>
-                  <span className="text-xs text-gray-500 font-bold uppercase tracking-widest">Ex-Showroom Price</span>
-                </div>
-
-
-                {/* Quick spec grid */}
-                <div className="grid grid-cols-2 gap-3 mb-6">
-                  <QuickSpec label="Horsepower" value={`${tractor.hp} HP`} icon="⚡" />
-                  <QuickSpec label="Cylinders" value={spec.cylinder ?? "—"} icon="🔩" />
-                  <QuickSpec label="Displacement" value={spec.engineCapacity ? `${spec.engineCapacity} cc` : "—"} icon="⚙️" />
-                  <QuickSpec label="PTO Power" value={spec.ptoHp ? `${spec.ptoHp} HP` : "—"} icon="🔌" />
-                </div>
-
+                <p className="text-[9px] font-black text-gray-400 uppercase tracking-widest mb-1">
+                  Estimated Ex-Showroom Price
+                </p>
+                <span className="text-3xl sm:text-4xl font-black text-emerald-800 tracking-tight leading-none">
+                  ₹{tractor.price?.toLocaleString("en-IN")}
+                </span>
               </div>
+            </div>
 
-              {/* CTA Buttons */}
-              <div className="flex flex-col sm:flex-row gap-3">
-                <button
-                  onClick={() => document.getElementById("enquiry").scrollIntoView({ behavior: "smooth" })}
-                  className="flex-1 bg-green-600 hover:bg-green-700 text-white py-4 rounded-xl font-black uppercase tracking-widest text-base transition-all shadow-md shadow-green-200 flex items-center justify-center gap-2"
-                >
-                  Get Best Price
-                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                  </svg>
-                </button>
-                <button
-                  onClick={() => document.getElementById("specs").scrollIntoView({ behavior: "smooth" })}
-                  className="flex-1 border border-gray-200 bg-white hover:bg-gray-50 text-gray-800 py-4 rounded-xl font-black uppercase tracking-widest text-base transition-all"
-                >
-                  Full Specifications
-                </button>
-              </div>
+            {/* Quick specifications quad grid matrix */}
+            <div className="grid grid-cols-2 gap-2 sm:gap-3">
+              <QuickSpec label="Horsepower" value={`${tractor.hp} HP`} icon="⚡" />
+              <QuickSpec label="Cylinders" value={spec.cylinder ?? "—"} icon="🔩" />
+              <QuickSpec label="Engine Capacity" value={spec.engineCapacity ? `${spec.engineCapacity} cc` : "—"} icon="⚙️" />
+              <QuickSpec label="PTO Power" value={spec.ptoHp ? `${spec.ptoHp} HP` : "—"} icon="🔌" />
+            </div>
+
+            {/* Primary Action Buttons CTAs */}
+            <div className="flex flex-col sm:flex-row gap-3 pt-2">
+              <button
+                onClick={() => document.getElementById("enquiry")?.scrollIntoView({ behavior: "smooth" })}
+                className="flex-1 bg-emerald-700 hover:bg-emerald-800 text-white py-3.5 rounded-none font-black uppercase tracking-widest text-xs transition-colors flex items-center justify-center gap-2 shadow-md active:scale-[0.98]"
+              >
+                Get Best Price
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                </svg>
+              </button>
+              <button
+                onClick={() => document.getElementById("specs")?.scrollIntoView({ behavior: "smooth" })}
+                className="flex-1 border border-stone-300 hover:bg-stone-50 text-stone-700 py-3.5 rounded-none font-black uppercase tracking-widest text-xs transition-colors active:scale-[0.98]"
+              >
+                Full Specifications
+              </button>
             </div>
           </div>
         </div>
 
-        {/* ══ SPECIFICATIONS ════════════════════════════════════════════════════ */}
-        <section id="specs">
-          <SectionHeading title="Technical Specifications" subtitle="Detailed breakdown of all technical parameters" />
+        {/* ── TECHNICAL SPECIFICATIONS ACCORDION / TABLE SECTION ────────────── */}
+        <div id="specs">
+          <SpecTable tractor={tractor} />
+        </div>
 
-          <div className="space-y-6">
-            {SPEC_TABS.map((tab) => {
-              const visibleRows = tab.rows.filter(r => r.value != null && r.value !== "");
-              if (visibleRows.length === 0) return null;
-
-              return (
-                <div key={tab.id} className={`${tab.theme.bg} rounded-2xl border ${tab.theme.border} shadow-sm overflow-hidden`}>
-                  <div className={`flex items-center gap-3 px-6 py-5 ${tab.theme.headerBg} border-b ${tab.theme.border}`}>
-                    <div className={`${tab.theme.iconBg} text-white shadow-sm p-2.5 rounded-xl`}>
-                      {tab.icon}
-                    </div>
-                    <h3 className={`text-lg font-black ${tab.theme.accent} uppercase tracking-widest italic`}>{tab.label}</h3>
-                  </div>
-
-                  <div className="p-6 lg:p-8">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-0">
-                      {visibleRows.map((row, i) => (
-                        <div key={i} className="flex justify-between items-center py-4 border-b border-black/5 last:border-0 rounded-lg px-2 -mx-2 transition-colors">
-                          <span className="text-sm font-bold text-gray-800 flex-shrink-0 pr-4">{row.label}</span>
-                          <span className="text-sm font-bold text-gray-900 text-right">{row.value}</span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-
-          <div className="mt-6">
-            <p className="text-xs font-bold text-gray-500">
-              * Specifications may vary by variant and region. Contact your nearest dealer for exact details.
-            </p>
-          </div>
-        </section>
-
-        {/* ══ MORE FROM BRAND ═══════════════════════════════════════════════════ */}
+        {/* ── MORE FROM BRAND (TWIN GRID MATRIX FOR SMARTPHONES VIEW) ────────── */}
         {brandRelated.length > 0 && (
-          <section>
+          <section className="pt-2">
             <SectionHeading
               title={`More from ${tractor.brand}`}
               action="View All →"
-              onAction={() => {
-  navigate("/tractors");
-  window.scrollTo(0, 0);
-}}
+              onAction={() => { navigate("/tractors"); window.scrollTo(0, 0); }}
             />
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {/* grid-cols-2 locks twin card boxes on small mobile screen viewports */}
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               {brandRelated.map(item => <Card key={item.id} data={item} />)}
             </div>
           </section>
         )}
 
-        {/* ══ POPULAR ALTERNATIVES ══════════════════════════════════════════════ */}
+        {/* ── POPULAR ALTERNATIVES (TWIN GRID MATRIX FOR SMARTPHONES VIEW) ───── */}
         {generalRelated.length > 0 && (
-          <section>
+          <section className="pt-2">
             <SectionHeading
               title="Popular Alternatives"
               action="Browse All →"
-              onAction={() => {
-  navigate("/tractors");
-  window.scrollTo(0, 0);
-}}
+              onAction={() => { navigate("/tractors"); window.scrollTo(0, 0); }}
             />
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
+            {/* grid-cols-2 locks twin card boxes on small mobile screen viewports */}
+            <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
               {generalRelated.map(item => <Card key={item.id} data={item} />)}
             </div>
           </section>
         )}
 
-        {/* ══ ENQUIRY ═══════════════════════════════════════════════════════════ */}
-        <section id="enquiry">
-          <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden flex flex-col lg:flex-row">
-            {/* Left promo panel */}
-            <div className="lg:w-5/12 bg-gradient-to-br from-[#0F3D2E] to-[#1a5c40] p-8 lg:p-12 flex flex-col justify-center relative overflow-hidden">
-              <div className="absolute -right-20 -bottom-20 w-64 h-64 bg-green-400/10 rounded-full pointer-events-none" />
-              <div className="absolute right-8 top-8 w-32 h-32 bg-green-400/5 rounded-full pointer-events-none" />
-              <div className="relative z-10 space-y-5">
-                <div className="inline-flex items-center gap-2 bg-green-400/15 border border-green-400/20 text-green-300 text-xs font-semibold px-3 py-1.5 rounded-full">
-                  <span className="w-1.5 h-1.5 bg-green-400 rounded-full" />
-                  Namaste Tractor — Direct Connect
-                </div>
-                <h2 className="text-2xl lg:text-3xl font-bold text-white leading-snug">
-                  Get the Best Price for{" "}
-                  <span className="text-green-400">{tractor.model}</span>
+        {/* ════ ENQUIRY VERIFICATION BLOCK SECTION ═══════════════════════════════ */}
+        <section id="enquiry" className="pt-2">
+          <div className="bg-white rounded-none border border-stone-200 shadow-sm overflow-hidden">
+
+            {/* Dark aesthetic brand header promo banner block */}
+            <div className="bg-slate-900 px-5 py-6 sm:px-8 sm:py-8 relative overflow-hidden">
+              <div className="absolute -right-16 -top-16 w-48 h-48 bg-emerald-500/10 rounded-full pointer-events-none" />
+              <div className="relative z-10">
+                <span className="inline-flex items-center gap-1.5 bg-emerald-500/15 border border-emerald-500/20 text-emerald-300 text-[10px] font-black px-2.5 py-1 rounded-none mb-3 uppercase tracking-widest">
+                  Direct Connect — No Middlemen
+                </span>
+                <h2 className="text-xl sm:text-2xl font-black text-white leading-snug mb-3 tracking-tight">
+                  Best Quote Pipeline for <span className="text-emerald-400">{tractor.model}</span>
                 </h2>
-                <p className="text-green-100/70 text-sm leading-relaxed">
-                  Talk directly to our team — no middlemen. Get the lowest on-road price, easy financing, and government subsidy support.
-                </p>
-                <div className="space-y-3 pt-2">
-                  {[
-                    { icon: "✓", text: "Guaranteed Best Quote" },
-                    { icon: "✓", text: "Expert Consultation" },
-                    { icon: "✓", text: "Easy Finance & Subsidy Support" },
-                  ].map(item => (
-                    <div key={item.text} className="flex items-center gap-3">
-                      <div className="w-7 h-7 rounded-lg bg-green-400/20 flex items-center justify-center text-green-400 text-xs font-bold flex-shrink-0">
-                        {item.icon}
-                      </div>
-                      <p className="text-sm font-medium text-white/90">{item.text}</p>
+                <div className="flex flex-wrap gap-x-5 gap-y-1.5">
+                  {["Guaranteed Dealer Quote", "Easy Finance & Subsidy", "Expert Verification"].map(text => (
+                    <div key={text} className="flex items-center gap-1.5">
+                      <span className="text-emerald-400 font-black text-xs">✓</span>
+                      <span className="text-slate-300 text-xs sm:text-sm font-medium tracking-wide uppercase">{text}</span>
                     </div>
                   ))}
                 </div>
               </div>
             </div>
 
-            {/* Right — Form */}
-            <div className="lg:w-7/12 p-8 lg:p-12 bg-gray-50/50 flex items-center">
-              <div className="w-full">
-                <EnquiryForm
-                  defaultType="tractor"
-                  defaultMessage={`I'm interested in the ${tractor.brand} ${tractor.model} (${tractor.hp} HP). Please share the best on-road price and booking details.`}
-                  hideHeader
-                  transparent
-                />
-              </div>
+            {/* Form wrapper */}
+            <div className="p-4 sm:p-8 bg-stone-50/60">
+              <EnquiryForm
+                defaultType="tractor"
+                defaultMessage={`I'm interested in the ${tractor.brand} ${tractor.model} (${tractor.hp} HP). Please share the best on-road price.`}
+                hideHeader
+                transparent
+              />
             </div>
           </div>
         </section>
@@ -510,36 +270,5 @@ const TractorDetail = () => {
     </div>
   );
 };
-
-/* ─── Helper Components ─────────────────────────────────────────────────────── */
-
-const QuickSpec = ({ label, value, icon }) => (
-  <div className="flex items-center gap-3 bg-gray-50 border border-gray-100 rounded-xl p-3.5 hover:bg-green-50/40 hover:border-green-100 transition-all group">
-    <div className="w-9 h-9 rounded-lg bg-white border border-gray-100 flex items-center justify-center text-base shadow-sm flex-shrink-0">
-      {icon}
-    </div>
-    <div className="min-w-0">
-      <p className="text-[11px] font-bold text-gray-700 uppercase tracking-wider truncate">{label}</p>
-      <p className="text-sm font-black text-gray-900 truncate italic">{value}</p>
-    </div>
-  </div>
-);
-
-const SectionHeading = ({ title, subtitle, action, onAction }) => (
-  <div className="flex items-start justify-between mb-6">
-    <div>
-      <h2 className="text-2xl font-black text-gray-900 tracking-tight">{title}</h2>
-      {subtitle && <p className="text-sm font-medium text-gray-500 mt-1">{subtitle}</p>}
-    </div>
-    {action && (
-      <button
-        onClick={onAction}
-        className="text-sm font-bold text-green-700 hover:text-green-800 transition-colors flex-shrink-0 ml-4 uppercase tracking-widest"
-      >
-        {action}
-      </button>
-    )}
-  </div>
-);
 
 export default TractorDetail;
