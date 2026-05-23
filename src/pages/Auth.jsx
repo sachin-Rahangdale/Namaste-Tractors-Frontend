@@ -29,7 +29,7 @@ const Auth = () => {
         setStatus({
           loading: false,
           isError: false,
-          message: "Registration successful! Please check your email to verify your account before logging in.",
+          message: "Registration successful! Now you are ready to log in.",
         });
         setIsLogin(true);
       }
