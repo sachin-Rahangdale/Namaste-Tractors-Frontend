@@ -7,6 +7,8 @@ import { getTractorById, getTractorsByBrand, getTractors } from "../services/tra
 import ImageSlider from "./tractordetail/ImageSlider";
 import SpecTable from "./tractordetail/SpecTable";
 
+import { Helmet } from "react-helmet-async";
+
 /* ─── QuickSpec pill (SHARP EDGES OPTIMIZED) ─────────────────────────────────── */
 const QuickSpec = ({ label, value, icon }) => (
   <div className="flex items-center gap-2.5 bg-stone-50 border border-stone-200 rounded-none p-2.5 transition-colors">
@@ -107,6 +109,22 @@ const TractorDetail = () => {
   const spec = tractor.specification || {};
 
   return (
+<>
+<Helmet>
+  <title>
+    {tractor.brand} {tractor.model} Price, Specs & HP
+  </title>
+
+  <meta
+    name="description"
+    content={`${tractor.model} tractor with ${tractor.hp} HP. Check price, specifications, features and images.`}
+  />
+
+  <meta
+    property="og:image"
+    content={tractor.imageUrl}
+  />
+</Helmet>
     <div className="bg-[#ebe8e3] min-h-screen pb-12">
       <Navbar />
 
@@ -268,6 +286,7 @@ const TractorDetail = () => {
 
       </main>
     </div>
+    </>
   );
 };
 

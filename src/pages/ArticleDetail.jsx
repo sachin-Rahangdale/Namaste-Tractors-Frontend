@@ -10,6 +10,8 @@ import {
   postComment,
 } from "../services/articleService";
 
+import { HelmetProvider } from "react-helmet-async";
+
 const ArticleDetail = () => {
   const { slug } = useParams();
   const navigate = useNavigate();
@@ -143,6 +145,18 @@ const ArticleDetail = () => {
   };
 
   return (
+
+    <>
+
+<Helmet>
+  <title>{article.title}</title>
+
+  <meta
+    name="description"
+    content={article.content?.slice(0, 150)}
+  />
+</Helmet>
+
     <div className="bg-[#ebe8e3] min-h-screen pb-16">
       <Navbar />
 
@@ -360,6 +374,7 @@ const ArticleDetail = () => {
 
       </main>
     </div>
+    </>
   );
 };
 

@@ -14,6 +14,8 @@ import { getProducts } from "../services/productService";
 
 import { Link } from "react-router-dom";
 
+import { Helmet } from "react-helmet-async";
+
 const Home = () => {
   const [tractors, setTractors] = useState([]);
   const [articles, setArticles] = useState([]);
@@ -46,6 +48,20 @@ const Home = () => {
   }, []);
 
   return (
+
+<>
+<Helmet>
+  <title>
+    Namaste Tractor - Tractor Prices, Specs & Farming Articles
+  </title>
+
+  <meta
+    name="description"
+    content="Explore tractor prices, specifications, farming products and latest agriculture articles on Namaste Tractor."
+  />
+</Helmet>
+
+    
     <div className="min-h-screen bg-[#F4F7F4] overflow-x-hidden">
 
       <Navbar />
@@ -195,6 +211,7 @@ const Home = () => {
       </div>
 
     </div>
+    </>
   );
 };
 
